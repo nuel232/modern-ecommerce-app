@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "106766414405",
+    "project_id": "ecommerce-app-4f158",
+    "storage_bucket": "ecommerce-app-4f158.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:106766414405:android:9590f3bf3f100785a1a92c",
+        "android_client_info": {
+          "package_name": "com.example.morden_ecommerce_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBMPix7i9sgSsvnaeGR2nbppdTkMxOQ6yw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
