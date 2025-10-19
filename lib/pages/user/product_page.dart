@@ -88,12 +88,67 @@ class ProductPage extends StatelessWidget {
             ],
           ),
 
-          SliverList(
-            delegate: SliverChildBuilderDelegate((context, index) {
-              final product = products[index];
-              return ShopTile(product: product);
-            }, childCount: products.length),
+          // Hot Picks Section
+          SliverToBoxAdapter(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.fromLTRB(16, 20, 16, 12),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.local_fire_department,
+                        color: Colors.orange,
+                        size: 24,
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        'Hot Picks',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: colorScheme.onPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 280,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: products.length,
+                    itemBuilder: (context, index) {
+                      final product = products[index];
+                      return Container(
+                        width: 180,
+                        margin: EdgeInsets.only(right: 16),
+                        child: ShopTile(product: product),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
           ),
+
+          // All Products Section Header
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(16, 24, 16, 12),
+              child: Text(
+                'All Products',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.onPrimary,
+                ),
+              ),
+            ),
+          ),
+
           SliverPadding(
             padding: EdgeInsets.all(16),
             sliver: SliverGrid(

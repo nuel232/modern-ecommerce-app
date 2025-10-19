@@ -14,6 +14,7 @@ void main() {
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
         ChangeNotifierProvider(create: (context) => Shop()),
       ],
+      child: const MyApp(),
     ),
   );
 }
