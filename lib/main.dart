@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:morden_ecommerce_app/models/shop.dart';
 import 'package:morden_ecommerce_app/services/auth/auth_gate.dart';
 import 'package:morden_ecommerce_app/services/theme/theme_provider.dart';
 import 'package:provider/provider.dart';
@@ -8,9 +9,11 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => ThemeProvider(),
-      builder: (context, child) => const MyApp(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => ThemeProvider()),
+        ChangeNotifierProvider(create: (context) => Shop()),
+      ],
     ),
   );
 }

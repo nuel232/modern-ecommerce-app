@@ -36,7 +36,6 @@ class _AdminPageState extends State<AdminPage> {
         onTabChange: (index) => navigateButtomBar(index),
         text: 'Dashboard',
         icon: Icons.dashboard,
-
         text2: "product",
         icon2: Icons.production_quantity_limits,
         text3: "orders",
