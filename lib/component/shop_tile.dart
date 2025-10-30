@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:morden_ecommerce_app/models/product.dart';
 
 class ShopTile extends StatelessWidget {
-  final Product product;
+  final ProductModel product;
   const ShopTile({super.key, required this.product});
 
   @override

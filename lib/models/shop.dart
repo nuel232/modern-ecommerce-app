@@ -1,32 +1,75 @@
 import 'package:flutter/cupertino.dart';
+
 import 'package:morden_ecommerce_app/models/product.dart';
 
 class Shop extends ChangeNotifier {
-  List<Product> _shop = [
-    Product(description: 'hey', name: 'jordan', price: 500),
-    Product(description: 'hey', name: 'jordan', price: 500),
-    Product(description: 'hey', name: 'jordan', price: 500),
-    Product(description: 'hey', name: 'jordan', price: 500),
-    Product(description: 'hey', name: 'jordan', price: 500),
-    Product(description: 'hey', name: 'jordan', price: 500),
+  final List<ProductModel> _shop = [
+    ProductModel(
+      uid: '1',
+      description: 'hey',
+      name: 'jordan',
+      price: 500,
+      stock: 2,
+      imagePath: '',
+    ),
+    ProductModel(
+      uid: '2',
+      description: 'hey',
+      name: 'jordan',
+      price: 500,
+      stock: 2,
+      imagePath: '',
+    ),
+    ProductModel(
+      uid: '3',
+      description: 'hey',
+      name: 'jordan',
+      price: 500,
+      stock: 2,
+      imagePath: '',
+    ),
+    ProductModel(
+      uid: '4',
+      description: 'hey',
+      name: 'jordan',
+      price: 500,
+      stock: 2,
+      imagePath: '',
+    ),
+    ProductModel(
+      uid: '5',
+      description: 'hey',
+      name: 'jordan',
+      price: 500,
+      stock: 2,
+      imagePath: '',
+    ),
+    ProductModel(
+      uid: '6',
+      description: 'hey',
+      name: 'jordan',
+      price: 500,
+      stock: 2,
+      imagePath: '',
+    ),
   ];
 
   //user cart
-  List<Product> _cart = [];
+  final List<ProductModel> _cart = [];
 
-  //get the the products and the cart
-  List<Product> get shop => _shop;
+  //get the the ProductModels and the cart
+  List<ProductModel> get shop => _shop;
 
-  //get the products int t  he cart
-  List<Product> get cart => _cart;
+  //get the ProductModels int t  he cart
+  List<ProductModel> get cart => _cart;
 
   //add to cart
-  void addToCart(Product item) {
+  void addToCart(ProductModel item) {
     _cart.add(item);
   }
 
   //remove from cart
-  void removeFromCart(Product item) {
+  void removeFromCart(ProductModel item) {
     _cart.remove(item);
   }
 }

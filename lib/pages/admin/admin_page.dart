@@ -6,7 +6,7 @@ import 'package:morden_ecommerce_app/pages/admin/dashboard_page.dart';
 import 'package:morden_ecommerce_app/pages/admin/order_page.dart';
 
 class AdminPage extends StatefulWidget {
-  AdminPage({super.key});
+  const AdminPage({super.key});
 
   @override
   State<AdminPage> createState() => _AdminPageState();
