@@ -5,7 +5,7 @@ import 'package:morden_ecommerce_app/models/product.dart';
 class Shop extends ChangeNotifier {
   final List<ProductModel> _shop = [
     ProductModel(
-      uid: '1',
+      productId: '1',
       description: 'hey',
       name: 'jordan',
       price: 500,
@@ -13,7 +13,7 @@ class Shop extends ChangeNotifier {
       imagePath: '',
     ),
     ProductModel(
-      uid: '2',
+      productId: '2',
       description: 'hey',
       name: 'jordan',
       price: 500,
@@ -21,7 +21,7 @@ class Shop extends ChangeNotifier {
       imagePath: '',
     ),
     ProductModel(
-      uid: '3',
+      productId: '3',
       description: 'hey',
       name: 'jordan',
       price: 500,
@@ -29,7 +29,7 @@ class Shop extends ChangeNotifier {
       imagePath: '',
     ),
     ProductModel(
-      uid: '4',
+      productId: '4',
       description: 'hey',
       name: 'jordan',
       price: 500,
@@ -37,7 +37,7 @@ class Shop extends ChangeNotifier {
       imagePath: '',
     ),
     ProductModel(
-      uid: '5',
+      productId: '5',
       description: 'hey',
       name: 'jordan',
       price: 500,
@@ -45,7 +45,7 @@ class Shop extends ChangeNotifier {
       imagePath: '',
     ),
     ProductModel(
-      uid: '6',
+      productId: '6',
       description: 'hey',
       name: 'jordan',
       price: 500,
