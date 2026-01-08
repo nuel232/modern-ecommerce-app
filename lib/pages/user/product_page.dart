@@ -6,13 +6,25 @@ import 'package:morden_ecommerce_app/models/shop.dart';
 import 'package:morden_ecommerce_app/pages/user/cart_page.dart';
 import 'package:provider/provider.dart';
 
-class ProductPage extends StatelessWidget {
+class ProductPage extends StatefulWidget {
   const ProductPage({super.key});
+
+  @override
+  State<ProductPage> createState() => _ProductPageState();
+}
+
+class _ProductPageState extends State<ProductPage> {
+  final TextEditingController searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final TextEditingController searchController = TextEditingController();
     final products = context.watch<Shop>().shop;
 
     return Scaffold(
@@ -20,81 +32,35 @@ class ProductPage extends StatelessWidget {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            pinned: true,
+            pinned: true, // Keeps the app bar fixed
             floating: false,
-            expandedHeight: 120,
-            collapsedHeight: kToolbarHeight, // Standard toolbar height
-
+            expandedHeight: 100, // Height when expanded
             backgroundColor: colorScheme.surface,
-            elevation: 1,
+            elevation: 0,
+            // The "Shop" title that scrolls away
             flexibleSpace: FlexibleSpaceBar(
-              titlePadding: EdgeInsets.zero,
+              titlePadding: EdgeInsets.only(left: 16, bottom: 16),
+              title: Text(
+                'Shop',
+                style: TextStyle(
+                  color: colorScheme.onSurface,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               centerTitle: false,
-              // This shows "Shop" text when expanded, scrolls away when collapsed
-              title: Padding(
-                padding: EdgeInsets.fromLTRB(16, 0, 0, 0),
-                child: Align(
-                  alignment: Alignment.bottomLeft,
-                  child: Text(
-                    'Shop',
-                    style: TextStyle(
-                      color: colorScheme.onSurface,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
             ),
-            // Search bar and cart icon stay fixed at the bottom
-            bottom: PreferredSize(
-              preferredSize: Size.fromHeight(60),
-              child: Container(
-                padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: SizedBox(
-                        height: 42,
-                        child: MyTextfield(
-                          padding: EdgeInsets.all(10),
-                          controller: searchController,
-                          hintText: 'Search...',
-                          obscureText: false,
-                          borderRadius: 8,
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 0,
-                          ),
-                          prefixIcon: Icon(Icons.search, size: 18),
-                          suffixIcon: searchController.text.isEmpty
-                              ? null
-                              : IconButton(
-                                  padding: EdgeInsets.zero,
-                                  icon: Icon(Icons.clear, size: 18),
-                                  onPressed: () => searchController.clear(),
-                                ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    IconButton(
-                      icon: Icon(
-                        Icons.shopping_cart_outlined,
-                        color: colorScheme.onSurface,
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => CartPage()),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
+          ),
+
+          // Fixed search bar and cart icon (pinned below the app bar)
+          SliverPersistentHeader(
+            pinned: true, // This keeps it fixed
+            delegate: _SearchBarDelegate(
+              colorScheme: colorScheme,
+              searchController: searchController,
+              minHeight: 70,
+              maxHeight: 70,
             ),
-            // Remove the old actions since cart icon is now in bottom
           ),
 
           // Hot Picks Section
@@ -158,6 +124,7 @@ class ProductPage extends StatelessWidget {
             ),
           ),
 
+          // All Products Grid
           SliverPadding(
             padding: EdgeInsets.all(16),
             sliver: SliverGrid(
@@ -168,18 +135,108 @@ class ProductPage extends StatelessWidget {
                 childAspectRatio: 0.75,
               ),
               delegate: SliverChildBuilderDelegate((context, index) {
-                return Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Center(child: Text('Product $index')),
-                );
+                final product = products[index % products.length];
+                return ShopTile(product: product);
               }, childCount: 20),
             ),
           ),
         ],
       ),
     );
+  }
+}
+
+// Custom delegate for the search bar that stays pinned
+class _SearchBarDelegate extends SliverPersistentHeaderDelegate {
+  final ColorScheme colorScheme;
+  final TextEditingController searchController;
+  final double minHeight;
+  final double maxHeight;
+
+  _SearchBarDelegate({
+    required this.colorScheme,
+    required this.searchController,
+    required this.minHeight,
+    required this.maxHeight,
+  });
+
+  @override
+  double get minExtent => minHeight;
+
+  @override
+  double get maxExtent => maxHeight;
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return Container(
+      color: colorScheme.surface,
+      padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: SizedBox(
+              height: 48,
+              child: TextField(
+                controller: searchController,
+                decoration: InputDecoration(
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: colorScheme.primary),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: colorScheme.tertiary),
+                  ),
+                  fillColor: colorScheme.primary,
+                  filled: true,
+                  hintText: 'Search...',
+                  prefixIcon: Icon(Icons.search, size: 20),
+                  suffixIcon: searchController.text.isEmpty
+                      ? null
+                      : IconButton(
+                          padding: EdgeInsets.zero,
+                          icon: Icon(Icons.clear, size: 18),
+                          onPressed: () => searchController.clear(),
+                        ),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: 12),
+          Container(
+            decoration: BoxDecoration(
+              color: colorScheme.primary,
+              shape: BoxShape.circle,
+            ),
+            child: IconButton(
+              icon: Icon(
+                Icons.shopping_cart_outlined,
+                color: colorScheme.onSurface,
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CartPage()),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  bool shouldRebuild(_SearchBarDelegate oldDelegate) {
+    return oldDelegate.searchController.text != searchController.text ||
+        oldDelegate.colorScheme != colorScheme;
   }
 }
