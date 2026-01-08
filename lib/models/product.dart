@@ -22,7 +22,7 @@ class ProductModel {
   //convert the productModel to a map for storing in firestore
   Map<String, dynamic> toMap() {
     return {
-      'uid': productId,
+      'productId': productId,
       'name': name,
       'description': description,
       'price': price,
@@ -40,7 +40,7 @@ class ProductModel {
       description: map['description'] ?? '',
       name: map['name'] ?? '',
       price: (map['price'] ?? 0).toDouble(),
-      stock: (map['stock'] ?? '').toInt(),
+      stock: (map['stock'] ?? 0).toInt(),
       imagePath: map['imagePath'] ?? '',
       categoryId: map['categoryId'] ?? '',
       createdAt: map['createdAt'] ?? '',

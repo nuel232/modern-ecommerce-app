@@ -4,12 +4,14 @@ class MyButton extends StatelessWidget {
   final String text;
   void Function()? onTap;
   final BorderRadiusGeometry? borderRadius;
+  final TextStyle? textStyle;
 
   MyButton({
     super.key,
     required this.text,
     required this.onTap,
     this.borderRadius,
+    this.textStyle,
   });
 
   @override
@@ -23,7 +25,9 @@ class MyButton extends StatelessWidget {
         ),
         margin: EdgeInsets.symmetric(horizontal: 25),
         padding: EdgeInsets.all(20),
-        child: Center(child: Text(text)),
+        child: Center(
+          child: Text(text, style: textStyle ?? TextStyle(fontSize: 16)),
+        ),
       ),
     );
   }

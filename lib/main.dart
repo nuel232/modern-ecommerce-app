@@ -1,12 +1,15 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:morden_ecommerce_app/firebase_options.dart';
 import 'package:morden_ecommerce_app/models/shop.dart';
 import 'package:morden_ecommerce_app/services/auth/auth_gate.dart';
 import 'package:morden_ecommerce_app/services/theme/theme_provider.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Initialize Firebase with the generated options
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   runApp(
     MultiProvider(

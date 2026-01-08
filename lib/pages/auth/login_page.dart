@@ -4,28 +4,50 @@ import 'package:morden_ecommerce_app/component/my_button.dart';
 import 'package:morden_ecommerce_app/component/my_textfield.dart';
 import 'package:morden_ecommerce_app/services/auth/auth_service.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   void Function()? onTap;
   LoginPage({super.key, required this.onTap});
 
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
 
   //login method
   void login(BuildContext context) async {
     //authservice
     final _authService = AuthService();
-
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
     try {
       await _authService.signInWithEmailAndPassword(
         emailController.text,
         passwordController.text,
       );
+      if (context.mounted) {
+        Navigator.pop(context);
+      }
     } catch (e) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(title: Text(e.toString())),
-      );
+      if (context.mounted) {
+        Navigator.pop(context);
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(title: Text(e.toString())),
+        );
+      }
     }
   }
 
@@ -43,7 +65,7 @@ class LoginPage extends StatelessWidget {
                 //icon
                 Icon(
                   Icons.shopping_bag_outlined,
-                  size: 70,
+                  size: 100,
                   color: Theme.of(context).colorScheme.inverseSurface,
                 ),
 
@@ -99,7 +121,15 @@ class LoginPage extends StatelessWidget {
                 SizedBox(height: 25),
 
                 //login button
-                MyButton(text: 'Login', onTap: () => login(context)),
+                MyButton(
+                  text: 'Login',
+                  textStyle: TextStyle(
+                    fontSize: 18,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  onTap: () => login(context),
+                ),
 
                 SizedBox(height: 25),
 
@@ -114,7 +144,7 @@ class LoginPage extends StatelessWidget {
                       ),
                     ),
                     GestureDetector(
-                      onTap: onTap,
+                      onTap: widget.onTap,
                       child: Text(
                         ' Register now',
                         style: TextStyle(

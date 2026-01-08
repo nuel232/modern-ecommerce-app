@@ -4,26 +4,48 @@ import 'package:morden_ecommerce_app/component/my_button.dart';
 import 'package:morden_ecommerce_app/component/my_textfield.dart';
 import 'package:morden_ecommerce_app/services/auth/auth_service.dart';
 
-class RegisterPage extends StatelessWidget {
+class RegisterPage extends StatefulWidget {
   final void Function()? onTap;
 
   RegisterPage({super.key, required this.onTap});
 
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
   TextEditingController emailController = TextEditingController();
-  TextEditingController ConfirmPasswordController = TextEditingController();
+  TextEditingController confirmPasswordController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
-  void signUp(BuildContext context) {
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  void signUp(BuildContext context) async {
     //authservice instance
     final _authservice = AuthService();
 
-    if (passwordController.text == ConfirmPasswordController.text) {
+    if (passwordController.text == confirmPasswordController.text) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(child: CircularProgressIndicator()),
+      );
       try {
-        _authservice.signUpWithEmailAndPassword(
+        await _authservice.signUpWithEmailAndPassword(
           emailController.text,
           passwordController.text,
         );
+        // Dismiss the loading dialog after sign-up completes
+        Navigator.pop(context);
       } catch (e) {
+        // Dismiss the loading dialog before showing error
+        Navigator.pop(context);
         showDialog(
           context: context,
           builder: (context) => AlertDialog(title: Text(e.toString())),
@@ -95,7 +117,7 @@ class RegisterPage extends StatelessWidget {
 
                 //Confirm password textfield
                 MyTextfield(
-                  controller: ConfirmPasswordController,
+                  controller: confirmPasswordController,
                   hintText: 'Confirm Password',
                   obscureText: true,
                 ),
@@ -103,7 +125,15 @@ class RegisterPage extends StatelessWidget {
                 SizedBox(height: 25),
 
                 //login button
-                MyButton(text: 'Sign Up', onTap: () => signUp(context)),
+                MyButton(
+                  text: 'Sign Up',
+                  textStyle: TextStyle(
+                    fontSize: 18,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  onTap: () => signUp(context),
+                ),
 
                 SizedBox(height: 25),
 
@@ -118,9 +148,9 @@ class RegisterPage extends StatelessWidget {
                       ),
                     ),
                     GestureDetector(
-                      onTap: onTap,
+                      onTap: widget.onTap,
                       child: Text(
-                        ' Login',
+                        'Login',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),

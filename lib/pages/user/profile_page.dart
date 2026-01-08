@@ -95,10 +95,13 @@ class ProfilePage extends StatelessWidget {
               ],
             ),
 
-            MyButton(
-              text: 'logout',
-              onTap: logout,
-              borderRadius: BorderRadius.circular(15),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20.0),
+              child: MyButton(
+                text: 'logout',
+                onTap: logout,
+                borderRadius: BorderRadius.circular(15),
+              ),
             ),
           ],
         ),
