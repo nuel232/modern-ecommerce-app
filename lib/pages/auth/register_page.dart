@@ -42,14 +42,18 @@ class _RegisterPageState extends State<RegisterPage> {
           passwordController.text,
         );
         // Dismiss the loading dialog after sign-up completes
-        Navigator.pop(context);
+        if (context.mounted) {
+          Navigator.pop(context);
+        }
       } catch (e) {
         // Dismiss the loading dialog before showing error
-        Navigator.pop(context);
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(title: Text(e.toString())),
-        );
+        if (context.mounted) {
+          Navigator.pop(context);
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(title: Text(e.toString())),
+          );
+        }
       }
     } else {
       showDialog(

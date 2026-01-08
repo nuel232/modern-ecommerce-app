@@ -29,34 +29,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: FutureBuilder(
-        future: Firebase.initializeApp(),
-        builder: (context, snapshot) {
-          // Show loading indicator while Firebase initializes
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Scaffold(
-              backgroundColor: Theme.of(context).colorScheme.surface,
-              body: Center(
-                child: CircularProgressIndicator(
-                  color: Theme.of(context).colorScheme.secondary,
-                ),
-              ),
-            );
-          }
-
-          // Show error if initialization fails
-          if (snapshot.hasError) {
-            return Scaffold(
-              body: Center(
-                child: Text('Error initializing app: ${snapshot.error}'),
-              ),
-            );
-          }
-
-          // Once Firebase is initialized, show AuthGate
-          return AuthGate();
-        },
-      ),
+      home: const AuthGate(),
       theme: Provider.of<ThemeProvider>(context).themeData,
     );
   }

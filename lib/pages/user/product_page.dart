@@ -23,69 +23,78 @@ class ProductPage extends StatelessWidget {
             pinned: true,
             floating: false,
             expandedHeight: 120,
+            collapsedHeight: kToolbarHeight, // Standard toolbar height
+
             backgroundColor: colorScheme.surface,
             elevation: 1,
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: EdgeInsets.zero,
               centerTitle: false,
-              title: Container(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              // This shows "Shop" text when expanded, scrolls away when collapsed
+              title: Padding(
+                padding: EdgeInsets.fromLTRB(16, 0, 0, 0),
+                child: Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Text(
+                    'Shop',
+                    style: TextStyle(
+                      color: colorScheme.onSurface,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            // Search bar and cart icon stay fixed at the bottom
+            bottom: PreferredSize(
+              preferredSize: Size.fromHeight(60),
+              child: Container(
+                padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
+                child: Row(
                   children: [
-                    Text(
-                      'Shop',
-                      style: TextStyle(
-                        color: colorScheme.onSurface,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                    Expanded(
+                      child: SizedBox(
+                        height: 42,
+                        child: MyTextfield(
+                          padding: EdgeInsets.all(10),
+                          controller: searchController,
+                          hintText: 'Search...',
+                          obscureText: false,
+                          borderRadius: 8,
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 0,
+                          ),
+                          prefixIcon: Icon(Icons.search, size: 18),
+                          suffixIcon: searchController.text.isEmpty
+                              ? null
+                              : IconButton(
+                                  padding: EdgeInsets.zero,
+                                  icon: Icon(Icons.clear, size: 18),
+                                  onPressed: () => searchController.clear(),
+                                ),
+                        ),
                       ),
                     ),
-                    SizedBox(
-                      height: 50,
-                      child: MyTextfield(
-                        padding: EdgeInsets.all(10),
-                        controller: searchController,
-                        hintText: 'Search...',
-                        obscureText: false,
-                        borderRadius: 8,
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 0,
-                        ),
-                        prefixIcon: Icon(Icons.search, size: 18),
-                        suffixIcon: searchController.text.isEmpty
-                            ? null
-                            : IconButton(
-                                padding:
-                                    EdgeInsets.zero, // Remove button padding
-                                icon: Icon(Icons.clear, size: 18),
-                                onPressed: () => searchController.clear(),
-                              ),
+                    SizedBox(width: 8),
+                    IconButton(
+                      icon: Icon(
+                        Icons.shopping_cart_outlined,
+                        color: colorScheme.onSurface,
                       ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => CartPage()),
+                        );
+                      },
                     ),
                   ],
                 ),
               ),
             ),
-            actions: [
-              Padding(
-                padding: EdgeInsets.only(bottom: 8),
-                child: IconButton(
-                  icon: Icon(
-                    Icons.shopping_cart_outlined,
-                    color: colorScheme.onSurface,
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => CartPage()),
-                    );
-                  },
-                ),
-              ),
-            ],
+            // Remove the old actions since cart icon is now in bottom
           ),
 
           // Hot Picks Section
