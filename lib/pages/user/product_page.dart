@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:morden_ecommerce_app/component/my_textfield.dart';
 import 'package:morden_ecommerce_app/component/shop_tile.dart';
 import 'package:morden_ecommerce_app/models/shop.dart';
 import 'package:morden_ecommerce_app/pages/user/cart_page.dart';
@@ -31,15 +29,15 @@ class _ProductPageState extends State<ProductPage> {
       backgroundColor: colorScheme.surface,
       body: CustomScrollView(
         slivers: [
+          // App bar with "Shop" title that scrolls away
           SliverAppBar(
-            pinned: true, // Keeps the app bar fixed
+            pinned: true,
             floating: false,
-            expandedHeight: 100, // Height when expanded
+            expandedHeight: 100,
             backgroundColor: colorScheme.surface,
             elevation: 0,
-            // The "Shop" title that scrolls away
             flexibleSpace: FlexibleSpaceBar(
-              titlePadding: EdgeInsets.only(left: 16, bottom: 16),
+              titlePadding: const EdgeInsets.only(left: 16, bottom: 10),
               title: Text(
                 'Shop',
                 style: TextStyle(
@@ -52,14 +50,18 @@ class _ProductPageState extends State<ProductPage> {
             ),
           ),
 
-          // Fixed search bar and cart icon (pinned below the app bar)
+          // Fixed search bar and cart icon
           SliverPersistentHeader(
-            pinned: true, // This keeps it fixed
+            pinned: true,
             delegate: _SearchBarDelegate(
               colorScheme: colorScheme,
               searchController: searchController,
-              minHeight: 70,
-              maxHeight: 70,
+              onCartPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const CartPage()),
+                );
+              },
             ),
           ),
 
@@ -69,15 +71,15 @@ class _ProductPageState extends State<ProductPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: EdgeInsets.fromLTRB(16, 20, 16, 12),
+                  padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
                   child: Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.local_fire_department,
                         color: Colors.orange,
                         size: 24,
                       ),
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       Text(
                         'Hot Picks',
                         style: TextStyle(
@@ -93,13 +95,13 @@ class _ProductPageState extends State<ProductPage> {
                   height: 280,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
-                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
                     itemCount: products.length,
                     itemBuilder: (context, index) {
                       final product = products[index];
                       return Container(
                         width: 180,
-                        margin: EdgeInsets.only(right: 16),
+                        margin: const EdgeInsets.only(right: 16),
                         child: ShopTile(product: product),
                       );
                     },
@@ -112,7 +114,7 @@ class _ProductPageState extends State<ProductPage> {
           // All Products Section Header
           SliverToBoxAdapter(
             child: Padding(
-              padding: EdgeInsets.fromLTRB(16, 24, 16, 12),
+              padding: const EdgeInsets.fromLTRB(16, 24, 16, 12),
               child: Text(
                 'All Products',
                 style: TextStyle(
@@ -146,25 +148,24 @@ class _ProductPageState extends State<ProductPage> {
   }
 }
 
-// Custom delegate for the search bar that stays pinned
+// Custom delegate for the search bar - FIXED HEIGHT CALCULATION
 class _SearchBarDelegate extends SliverPersistentHeaderDelegate {
   final ColorScheme colorScheme;
   final TextEditingController searchController;
-  final double minHeight;
-  final double maxHeight;
+  final VoidCallback onCartPressed;
 
   _SearchBarDelegate({
     required this.colorScheme,
     required this.searchController,
-    required this.minHeight,
-    required this.maxHeight,
+    required this.onCartPressed,
   });
 
+  // FIXED: Matching minExtent and maxExtent to actual content size
   @override
-  double get minExtent => minHeight;
+  double get minExtent => 64.0;
 
   @override
-  double get maxExtent => maxHeight;
+  double get maxExtent => 64.0;
 
   @override
   Widget build(
@@ -173,36 +174,26 @@ class _SearchBarDelegate extends SliverPersistentHeaderDelegate {
     bool overlapsContent,
   ) {
     return Container(
+      height: 64.0, // Explicit height matching extent
       color: colorScheme.surface,
-      padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8), // 8 + 48 + 8 = 64
       child: Row(
         children: [
+          // Search bar
           Expanded(
-            child: SizedBox(
+            child: Container(
               height: 48,
+              decoration: BoxDecoration(
+                color: colorScheme.primary,
+                borderRadius: BorderRadius.circular(8),
+              ),
               child: TextField(
                 controller: searchController,
                 decoration: InputDecoration(
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: colorScheme.primary),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: colorScheme.tertiary),
-                  ),
-                  fillColor: colorScheme.primary,
-                  filled: true,
+                  border: InputBorder.none,
                   hintText: 'Search...',
-                  prefixIcon: Icon(Icons.search, size: 20),
-                  suffixIcon: searchController.text.isEmpty
-                      ? null
-                      : IconButton(
-                          padding: EdgeInsets.zero,
-                          icon: Icon(Icons.clear, size: 18),
-                          onPressed: () => searchController.clear(),
-                        ),
-                  contentPadding: EdgeInsets.symmetric(
+                  prefixIcon: const Icon(Icons.search, size: 20),
+                  contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 12,
                   ),
@@ -210,8 +201,11 @@ class _SearchBarDelegate extends SliverPersistentHeaderDelegate {
               ),
             ),
           ),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
+          // Cart button
           Container(
+            width: 48,
+            height: 48,
             decoration: BoxDecoration(
               color: colorScheme.primary,
               shape: BoxShape.circle,
@@ -221,12 +215,7 @@ class _SearchBarDelegate extends SliverPersistentHeaderDelegate {
                 Icons.shopping_cart_outlined,
                 color: colorScheme.onSurface,
               ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => CartPage()),
-                );
-              },
+              onPressed: onCartPressed,
             ),
           ),
         ],
@@ -235,8 +224,8 @@ class _SearchBarDelegate extends SliverPersistentHeaderDelegate {
   }
 
   @override
-  bool shouldRebuild(_SearchBarDelegate oldDelegate) {
-    return oldDelegate.searchController.text != searchController.text ||
-        oldDelegate.colorScheme != colorScheme;
+  bool shouldRebuild(covariant _SearchBarDelegate oldDelegate) {
+    return oldDelegate.colorScheme != colorScheme ||
+        oldDelegate.searchController != searchController;
   }
 }
