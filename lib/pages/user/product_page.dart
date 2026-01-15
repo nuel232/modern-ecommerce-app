@@ -136,10 +136,11 @@ class _ProductPageState extends State<ProductPage> {
                 mainAxisSpacing: 16,
                 childAspectRatio: 0.75,
               ),
-              delegate: SliverChildBuilderDelegate((context, index) {
-                final product = products[index % products.length];
+              delegate: SliverChildBuilderDelegate((_, index) {
+                // ← Use underscore since we don't need context
+                final product = products[index];
                 return ShopTile(product: product);
-              }, childCount: 20),
+              }, childCount: products.length),
             ),
           ),
         ],

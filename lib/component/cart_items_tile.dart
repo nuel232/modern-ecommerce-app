@@ -1,82 +1,102 @@
 import 'package:flutter/material.dart';
+import 'package:morden_ecommerce_app/models/product.dart';
 import 'package:morden_ecommerce_app/models/shop.dart';
 import 'package:provider/provider.dart';
 
 class CartItemsTile extends StatelessWidget {
-  const CartItemsTile({super.key});
+  final ProductModel item;
+
+  const CartItemsTile({super.key, required this.item});
 
   @override
   Widget build(BuildContext context) {
-    final cart = context.watch<Shop>().cart;
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Scaffold(
-      appBar: AppBar(),
-      body: Column(
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: colorScheme.primary,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
         children: [
-          //cart list
-          Expanded(
-            child: ListView.builder(
-              itemBuilder: (context, index) {
-                //get inidiviual items in cart and
+          // Checkbox
+          Checkbox(
+            value: item.isSelected,
+            onChanged: (value) {
+              // TODO: Toggle selection
+            },
+          ),
 
-                final item = cart[index];
-
-                // return as a list tile
-                return ListTile(
-                  leading: Row(
-                    children: [
-                      Checkbox(value: item.isSelected, onChanged: (value) {}),
-
-                      const SizedBox(width: 4),
-                      Image.asset(
-                        item.imagePath,
-                        width: 40,
-                        height: 40,
-                        fit: BoxFit.cover,
-                      ),
-                    ],
-                  ),
-
-                  //name and price
-                  title: Text(item.name),
-                  subtitle: Text(
-                    '₦${item.price.toStringAsFixed(2)}',
-                    style: TextStyle(color: colorScheme.onPrimary),
-                  ),
-                  trailing: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.remove),
-                            onPressed: () {
-                              // decrease quantity
-                            },
-                          ),
-                          Text(item.quantity.toString()),
-                          IconButton(
-                            icon: const Icon(Icons.add),
-                            onPressed: () {
-                              // increase quantity
-                            },
-                          ),
-                        ],
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () {
-                          // remove from cart
-                        },
-                      ),
-                    ],
-                  ),
-                );
-                //
-              },
+          // Product Image
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.asset(
+              item.imagePath,
+              width: 60,
+              height: 60,
+              fit: BoxFit.cover,
             ),
+          ),
+
+          SizedBox(width: 12),
+
+          // Product Info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.name,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(height: 4),
+                Text(
+                  '₦${item.price.toStringAsFixed(2)}',
+                  style: TextStyle(
+                    color: Colors.green,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Quantity Controls
+          Column(
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.remove_circle_outline, size: 20),
+                    onPressed: () {
+                      // TODO: Decrease quantity
+                    },
+                  ),
+                  Text(
+                    '${item.quantity ?? 1}',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.add_circle_outline, size: 20),
+                    onPressed: () {
+                      // TODO: Increase quantity
+                    },
+                  ),
+                ],
+              ),
+              IconButton(
+                icon: Icon(Icons.delete_outline, color: Colors.red),
+                onPressed: () {
+                  // Remove from cart
+                  context.read<Shop>().removeFromCart(item);
+                },
+              ),
+            ],
           ),
         ],
       ),

@@ -126,7 +126,7 @@ class ShopTile extends StatelessWidget {
                     return addToCart(context);
                   },
                   child: Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
+                    padding: const EdgeInsets.only(top: 5.0),
                     child: Container(
                       padding: EdgeInsets.all(15),
                       decoration: BoxDecoration(
