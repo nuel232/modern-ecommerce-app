@@ -1,9 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:morden_ecommerce_app/models/product.dart';
+import 'package:morden_ecommerce_app/models/shop.dart';
+import 'package:provider/provider.dart';
 
 class ShopTile extends StatelessWidget {
   final ProductModel product;
   const ShopTile({super.key, required this.product});
+
+  void addToCart(BuildContext context) {
+    //show dialog box
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: Text('Add the to cart ?'),
+        actions: [
+          //cancel button
+          MaterialButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel'),
+          ),
+
+          //yes
+          MaterialButton(
+            onPressed: () {
+              //pop dialog box
+              Navigator.pop(context);
+
+              //add to cart
+              context.read<Shop>().addToCart(product);
+            },
+            child: Text('Yes'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +123,7 @@ class ShopTile extends StatelessWidget {
                 //button to add to cart
                 GestureDetector(
                   onTap: () {
-                    // Add the product to the cart
+                    return addToCart(context);
                   },
                   child: Padding(
                     padding: const EdgeInsets.only(top: 8.0),

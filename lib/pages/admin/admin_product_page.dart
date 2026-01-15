@@ -15,6 +15,7 @@ class _AdminProductPageState extends State<AdminProductPage> {
   final priceController = TextEditingController();
   final DescriptionController = TextEditingController();
   final productIdController = TextEditingController();
+  final quantityController = TextEditingController();
   String? imagePath;
   final ImagePicker _picker = ImagePicker();
 
@@ -87,7 +88,12 @@ class _AdminProductPageState extends State<AdminProductPage> {
           ? 0.0
           : double.parse(priceController.text),
       stock: stockController.text.isEmpty ? 0 : int.parse(stockController.text),
-      imagePath: '',
+
+      imagePath: imagePath ?? '',
+      isSelected: false,
+      quantity: quantityController.text.isEmpty
+          ? null
+          : int.parse(quantityController.text),
     );
 
     // Clear fields

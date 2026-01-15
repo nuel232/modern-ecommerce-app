@@ -4,6 +4,7 @@ class CartModel {
   final List<String> productIds;
   final double totalPrice;
   final double quantity;
+  final bool isSelected;
 
   CartModel({
     required this.cartId,
@@ -11,6 +12,7 @@ class CartModel {
     required this.productIds,
     required this.totalPrice,
     required this.quantity,
+    required this.isSelected,
   });
 
   Map<String, dynamic> toMap() {
@@ -30,6 +32,7 @@ class CartModel {
       productIds: List<String>.from(map['productIds'] ?? []),
       totalPrice: (map['totalPrice'] ?? 0).toDouble(),
       quantity: (map['quantity'] ?? 0).toDouble(),
+      isSelected: map['isSelected'] ?? false,
     );
   }
 }

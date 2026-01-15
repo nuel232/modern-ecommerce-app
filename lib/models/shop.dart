@@ -12,6 +12,8 @@ class Shop extends ChangeNotifier {
       price: 160000,
       stock: 5,
       imagePath: 'lib/Images/Air-deldon.png',
+      isSelected: false,
+      quantity: 1,
     ),
 
     ProductModel(
@@ -21,6 +23,8 @@ class Shop extends ChangeNotifier {
       price: 115000,
       stock: 5,
       imagePath: 'lib/Images/GT.png',
+      isSelected: false,
+      quantity: 1,
     ),
 
     ProductModel(
@@ -30,6 +34,8 @@ class Shop extends ChangeNotifier {
       price: 110000,
       stock: 5,
       imagePath: 'lib/Images/Tatum-3-tie-dye.png',
+      isSelected: false,
+      quantity: 1,
     ),
 
     ProductModel(
@@ -39,6 +45,8 @@ class Shop extends ChangeNotifier {
       price: 110000,
       stock: 5,
       imagePath: 'lib/Images/Tatum-3-tie-dye2.png',
+      isSelected: false,
+      quantity: 1,
     ),
 
     ProductModel(
@@ -48,6 +56,8 @@ class Shop extends ChangeNotifier {
       price: 130000,
       stock: 5,
       imagePath: 'lib/Images/Zoom-freek-4.jpg',
+      isSelected: false,
+      quantity: 1,
     ),
 
     ProductModel(
@@ -56,7 +66,9 @@ class Shop extends ChangeNotifier {
       description: 'Clean black design with everyday comfort.',
       price: 95000,
       stock: 8,
-      imagePath: 'lib/Images/Black-shoe-air.webp',
+      imagePath: 'lib/Images/Black-shoe.jpeg',
+      isSelected: false,
+      quantity: 1,
     ),
 
     ProductModel(
@@ -65,71 +77,76 @@ class Shop extends ChangeNotifier {
       description: 'Classic street-style sneakers with comfort.',
       price: 105000,
       stock: 6,
-      imagePath: 'lib/Images/H-Penny.jpg',
+      imagePath: 'lib/Images/HP-envy.jpg',
+      isSelected: false,
+      quantity: 1,
     ),
 
     ProductModel(
       productId: '8',
-      name: 'Nike Casual Sneakers',
-      description: 'Lightweight everyday Nike sneakers.',
-      price: 90000,
-      stock: 10,
-      imagePath: 'lib/Images/nike.png',
-    ),
-
-    ProductModel(
-      productId: '9',
       name: 'Brandon Step Loafer',
       description: 'Premium loafers for smart and casual wear.',
       price: 85000,
       stock: 7,
-      imagePath: 'lib/Images/Brandon Step Loafer.webp',
+      imagePath: 'lib/Images/Brandon-Step-Loafer.jpeg',
+      isSelected: false,
+      quantity: 1,
     ),
 
     ProductModel(
-      productId: '10',
+      productId: '9',
       name: 'Craft Arlo Lace',
       description: 'Handcrafted lace shoes with modern elegance.',
       price: 98000,
       stock: 6,
-      imagePath: 'lib/Images/Craft Arlo Lace.webp',
+      imagePath: 'lib/Images/Craft-Arlo-Lace.jpeg',
+      isSelected: false,
+      quantity: 1,
     ),
 
     // ===== ACCESSORIES =====
     ProductModel(
-      productId: '11',
+      productId: '10',
       name: 'Adwin Cap',
       description: 'Stylish cap for casual and sporty outfits.',
       price: 18000,
       stock: 15,
-      imagePath: 'lib/Images/Adwin Cap.webp',
+      imagePath: 'lib/Images/Aldwin-Cap.jpg',
+      isSelected: false,
+      quantity: 1,
     ),
 
     ProductModel(
-      productId: '12',
+      productId: '11',
       name: 'Classic Glasses',
       description: 'Fashion-forward glasses for daily wear.',
       price: 25000,
       stock: 12,
       imagePath: 'lib/Images/Glasses.jpg',
+      isSelected: false,
+      quantity: 1,
     ),
 
     ProductModel(
-      productId: '13',
+      productId: '12',
       name: 'Poplin Classic Fit Shirt',
       description: 'Comfortable classic-fit shirt for all occasions.',
       price: 42000,
       stock: 10,
-      imagePath: 'lib/Images/POPIN CLASSIC FIT.webp',
+      imagePath: 'lib/Images/POPLIN-CLASSIC-FIT-SHIRT.jpg',
+      isSelected: false,
+      quantity: 1,
     ),
 
     ProductModel(
-      productId: '14',
+      productId: '13',
       name: 'Silk Cotton Blend Shirt',
       description: 'Soft silk-cotton blend for premium comfort.',
       price: 48000,
       stock: 9,
-      imagePath: 'lib/Images/SILK COTTON BLEND.webp',
+      imagePath: 'lib/Images/SILK-COTTON-BLEND-SHIRT.png',
+      isSelected: false,
+      quantity: 1,
     ),
   ];
 
