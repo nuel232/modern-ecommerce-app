@@ -148,6 +148,16 @@ class Shop extends ChangeNotifier {
       isSelected: false,
       quantity: 1,
     ),
+    ProductModel(
+      productId: '13',
+      name: 'Silk Cotton Blend Shirt',
+      description: 'Soft silk-cotton blend for premium comfort.',
+      price: 48000,
+      stock: 9,
+      imagePath: 'lib/Images/SILK-COTTON-BLEND-SHIRT.png',
+      isSelected: false,
+      quantity: 1,
+    ),
   ];
 
   //user cart
