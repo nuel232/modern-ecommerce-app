@@ -125,12 +125,11 @@ class _ProductPageState extends State<ProductPage> {
               ),
             ),
           ),
-
           // All Products Grid
           SliverPadding(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             sliver: SliverGrid(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 crossAxisSpacing: 16,
                 mainAxisSpacing: 16,
@@ -149,7 +148,7 @@ class _ProductPageState extends State<ProductPage> {
   }
 }
 
-// Custom delegate for the search bar - FIXED HEIGHT CALCULATION
+// Custom delegate for the search bar
 class _SearchBarDelegate extends SliverPersistentHeaderDelegate {
   final ColorScheme colorScheme;
   final TextEditingController searchController;
@@ -161,7 +160,6 @@ class _SearchBarDelegate extends SliverPersistentHeaderDelegate {
     required this.onCartPressed,
   });
 
-  // FIXED: Matching minExtent and maxExtent to actual content size
   @override
   double get minExtent => 64.0;
 
@@ -175,12 +173,11 @@ class _SearchBarDelegate extends SliverPersistentHeaderDelegate {
     bool overlapsContent,
   ) {
     return Container(
-      height: 64.0, // Explicit height matching extent
+      height: 64.0,
       color: colorScheme.surface,
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8), // 8 + 48 + 8 = 64
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
       child: Row(
         children: [
-          // Search bar
           Expanded(
             child: Container(
               height: 48,
@@ -190,11 +187,11 @@ class _SearchBarDelegate extends SliverPersistentHeaderDelegate {
               ),
               child: TextField(
                 controller: searchController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   border: InputBorder.none,
                   hintText: 'Search...',
-                  prefixIcon: const Icon(Icons.search, size: 20),
-                  contentPadding: const EdgeInsets.symmetric(
+                  prefixIcon: Icon(Icons.search, size: 20),
+                  contentPadding: EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 12,
                   ),
@@ -203,7 +200,6 @@ class _SearchBarDelegate extends SliverPersistentHeaderDelegate {
             ),
           ),
           const SizedBox(width: 12),
-          // Cart button
           Container(
             width: 48,
             height: 48,
