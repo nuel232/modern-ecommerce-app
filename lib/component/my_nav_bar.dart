@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 
 class MyNavBar extends StatelessWidget {
-  Function(int)? onTabChange;
+  final Function(int)? onTabChange;
   final String text;
   final String text2;
   final String text3;
   final IconData icon;
   final IconData icon2;
   final IconData icon3;
-  MyNavBar({
+  const MyNavBar({
     super.key,
     required this.onTabChange,
     required this.text,

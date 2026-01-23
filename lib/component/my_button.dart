@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 class MyButton extends StatelessWidget {
   final String text;
-  void Function()? onTap;
+  final void Function()? onTap;
   final BorderRadiusGeometry? borderRadius;
   final TextStyle? textStyle;
 
-  MyButton({
+  const MyButton({
     super.key,
     required this.text,
     required this.onTap,

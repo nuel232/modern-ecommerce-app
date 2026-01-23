@@ -135,10 +135,17 @@ class _ProductPageState extends State<ProductPage> {
                 mainAxisSpacing: 16,
                 childAspectRatio: 0.75,
               ),
-              delegate: SliverChildBuilderDelegate((_, index) {
-                // ← Use underscore since we don't need context
-                final product = products[index];
-                return ShopTile(product: product);
+              delegate: SliverChildBuilderDelegate((context, index) {
+                try {
+                  final product = products[index];
+                  return ShopTile(product: product);
+                } catch (e) {
+                  print('Error rendering product at index $index: $e');
+                  return Container(
+                    color: Colors.red[100],
+                    child: Center(child: Text('Error loading product')),
+                  );
+                }
               }, childCount: products.length),
             ),
           ),

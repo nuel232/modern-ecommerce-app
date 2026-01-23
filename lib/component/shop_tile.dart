@@ -54,6 +54,7 @@ class ShopTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Product picture
+                // In shop_tile.dart - Line ~59
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
                   child: Image.asset(
@@ -61,6 +62,19 @@ class ShopTile extends StatelessWidget {
                     fit: BoxFit.cover,
                     width: double.infinity,
                     height: 150,
+                    errorBuilder: (context, error, stackTrace) {
+                      // ✅ ADD THIS
+                      return Container(
+                        width: double.infinity,
+                        height: 150,
+                        color: Colors.grey[300],
+                        child: Icon(
+                          Icons.broken_image,
+                          size: 50,
+                          color: Colors.grey[600],
+                        ),
+                      );
+                    },
                   ),
                 ),
 
@@ -70,7 +84,7 @@ class ShopTile extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10.0),
                   child: Text(
-                    product.description,
+                    product.description ?? 'No description',
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onPrimary,
                       fontSize: 12,
@@ -125,22 +139,19 @@ class ShopTile extends StatelessWidget {
                   onTap: () {
                     return addToCart(context);
                   },
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 1.0),
-                    child: Container(
-                      padding: EdgeInsets.all(15),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[900],
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(20),
-                          bottomRight: Radius.circular(10),
-                        ),
+                  child: Container(
+                    padding: EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[900],
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        bottomRight: Radius.circular(10),
                       ),
-                      child: Icon(
-                        Icons.add_shopping_cart,
-                        color: Colors.white,
-                        size: 20,
-                      ),
+                    ),
+                    child: Icon(
+                      Icons.add_shopping_cart,
+                      color: Colors.white,
+                      size: 20,
                     ),
                   ),
                 ),

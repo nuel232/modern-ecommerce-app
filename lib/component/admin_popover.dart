@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 
 class AdminPopover extends StatelessWidget {
-  void Function()? onDeleteTap;
-  void Function()? onEditTap;
+  final void Function()? onDeleteTap;
+  final void Function()? onEditTap;
 
-  AdminPopover({super.key, required this.onDeleteTap, required this.onEditTap});
+  const AdminPopover({
+    super.key,
+    required this.onDeleteTap,
+    required this.onEditTap,
+  });
 
   @override
   Widget build(BuildContext context) {

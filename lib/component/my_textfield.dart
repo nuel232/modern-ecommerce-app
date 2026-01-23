@@ -4,9 +4,9 @@ class MyTextfield extends StatelessWidget {
   final TextEditingController? controller;
   final String? hintText;
   final bool obscureText;
-  Widget? prefixIcon;
+  final Widget? prefixIcon;
   Widget? suffixIcon;
-  TextStyle? hintStyle;
+  final TextStyle? hintStyle;
   final double? borderRadius;
   final EdgeInsetsGeometry? padding;
   final EdgeInsetsGeometry? contentPadding;

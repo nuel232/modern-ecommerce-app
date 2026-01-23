@@ -149,7 +149,7 @@ class Shop extends ChangeNotifier {
       quantity: 1,
     ),
     ProductModel(
-      productId: '13',
+      productId: '14',
       name: 'Silk Cotton Blend Shirt',
       description: 'Soft silk-cotton blend for premium comfort.',
       price: 48000,
@@ -172,10 +172,12 @@ class Shop extends ChangeNotifier {
   //add to cart
   void addToCart(ProductModel item) {
     _cart.add(item);
+    notifyListeners();
   }
 
   //remove from cart
   void removeFromCart(ProductModel item) {
     _cart.remove(item);
+    notifyListeners();
   }
 }
