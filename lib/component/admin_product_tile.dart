@@ -77,7 +77,7 @@ class AdminProductTile extends StatelessWidget {
               SizedBox(width: 20),
               Icon(Icons.attach_money, size: 16, color: Colors.green),
               Text(
-                '$price.toStringAsFixed(2)',
+                '${price.toStringAsFixed(2)}',
                 style: TextStyle(
                   color: Colors.green,
                   fontWeight: FontWeight.bold,

@@ -63,7 +63,7 @@ class ShopTile extends StatelessWidget {
                     width: double.infinity,
                     height: 150,
                     errorBuilder: (context, error, stackTrace) {
-                      // ✅ ADD THIS
+                    
                       return Container(
                         width: double.infinity,
                         height: 150,
