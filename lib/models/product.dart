@@ -7,8 +7,6 @@ class ProductModel {
   final String imagePath;
   final String? categoryId;
   final String? createdAt;
-  final bool isSelected;
-  final int? quantity;
 
   ProductModel({
     required this.productId,
@@ -19,8 +17,6 @@ class ProductModel {
     required this.imagePath,
     this.categoryId,
     this.createdAt,
-    required this.isSelected,
-    this.quantity,
   });
 
   //convert the productModel to a map for storing in firestore
@@ -34,7 +30,6 @@ class ProductModel {
       'imagePath': imagePath,
       'categoryId': categoryId,
       'createdAt': createdAt,
-      'isSelected': isSelected,
     };
   }
 
@@ -49,8 +44,6 @@ class ProductModel {
       imagePath: map['imagePath'] ?? '',
       categoryId: map['categoryId'] ?? '',
       createdAt: map['createdAt'] ?? '',
-      isSelected: map['isSelected'] ?? false,
-      quantity: (map['quantity'] ?? 0).toInt(),
     );
   }
 }

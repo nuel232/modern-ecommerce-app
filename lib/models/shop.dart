@@ -12,8 +12,6 @@ class Shop extends ChangeNotifier {
       price: 160000,
       stock: 5,
       imagePath: 'lib/Images/Air-deldon.png',
-      isSelected: false,
-      quantity: 1,
     ),
 
     ProductModel(
@@ -23,8 +21,6 @@ class Shop extends ChangeNotifier {
       price: 115000,
       stock: 5,
       imagePath: 'lib/Images/GT.png',
-      isSelected: false,
-      quantity: 1,
     ),
 
     ProductModel(
@@ -34,8 +30,6 @@ class Shop extends ChangeNotifier {
       price: 110000,
       stock: 5,
       imagePath: 'lib/Images/Tatum-3-tie-dye.png',
-      isSelected: false,
-      quantity: 1,
     ),
 
     ProductModel(
@@ -45,8 +39,6 @@ class Shop extends ChangeNotifier {
       price: 110000,
       stock: 5,
       imagePath: 'lib/Images/Tatum-3-tie-dye2.png',
-      isSelected: false,
-      quantity: 1,
     ),
 
     ProductModel(
@@ -56,8 +48,6 @@ class Shop extends ChangeNotifier {
       price: 130000,
       stock: 5,
       imagePath: 'lib/Images/Zoom-freek-4.jpg',
-      isSelected: false,
-      quantity: 1,
     ),
 
     ProductModel(
@@ -67,8 +57,6 @@ class Shop extends ChangeNotifier {
       price: 95000,
       stock: 8,
       imagePath: 'lib/Images/Black-shoe.jpeg',
-      isSelected: false,
-      quantity: 1,
     ),
 
     ProductModel(
@@ -78,8 +66,6 @@ class Shop extends ChangeNotifier {
       price: 105000,
       stock: 6,
       imagePath: 'lib/Images/HP-envy.jpg',
-      isSelected: false,
-      quantity: 1,
     ),
 
     ProductModel(
@@ -89,8 +75,6 @@ class Shop extends ChangeNotifier {
       price: 85000,
       stock: 7,
       imagePath: 'lib/Images/Brandon-Step-Loafer.jpeg',
-      isSelected: false,
-      quantity: 1,
     ),
 
     ProductModel(
@@ -100,8 +84,6 @@ class Shop extends ChangeNotifier {
       price: 98000,
       stock: 6,
       imagePath: 'lib/Images/Craft-Arlo-Lace.jpeg',
-      isSelected: false,
-      quantity: 1,
     ),
 
     // ===== ACCESSORIES =====
@@ -112,8 +94,6 @@ class Shop extends ChangeNotifier {
       price: 18000,
       stock: 15,
       imagePath: 'lib/Images/Aldwin-Cap.jpg',
-      isSelected: false,
-      quantity: 1,
     ),
 
     ProductModel(
@@ -123,8 +103,6 @@ class Shop extends ChangeNotifier {
       price: 25000,
       stock: 12,
       imagePath: 'lib/Images/Glasses.jpg',
-      isSelected: false,
-      quantity: 1,
     ),
 
     ProductModel(
@@ -134,8 +112,6 @@ class Shop extends ChangeNotifier {
       price: 42000,
       stock: 10,
       imagePath: 'lib/Images/POPLIN-CLASSIC-FIT-SHIRT.jpg',
-      isSelected: false,
-      quantity: 1,
     ),
 
     ProductModel(
@@ -145,8 +121,6 @@ class Shop extends ChangeNotifier {
       price: 48000,
       stock: 9,
       imagePath: 'lib/Images/SILK-COTTON-BLEND-SHIRT.png',
-      isSelected: false,
-      quantity: 1,
     ),
     ProductModel(
       productId: '14',
@@ -155,8 +129,6 @@ class Shop extends ChangeNotifier {
       price: 48000,
       stock: 9,
       imagePath: 'lib/Images/SILK-COTTON-BLEND-SHIRT.png',
-      isSelected: false,
-      quantity: 1,
     ),
   ];
 

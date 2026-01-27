@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:morden_ecommerce_app/models/cart_item.dart';
 import 'package:morden_ecommerce_app/models/product.dart';
 import 'package:morden_ecommerce_app/models/shop.dart';
 import 'package:provider/provider.dart';
 
 class CartItemsTile extends StatelessWidget {
   final ProductModel item;
+  final CartItem cart;
 
-  const CartItemsTile({super.key, required this.item});
+  const CartItemsTile({super.key, required this.item, required this.cart});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +25,7 @@ class CartItemsTile extends StatelessWidget {
         children: [
           // Checkbox
           Checkbox(
-            value: item.isSelected,
+            value: cart.isSelected,
             onChanged: (value) {
               // TODO: Toggle selection
             },
@@ -78,7 +80,7 @@ class CartItemsTile extends StatelessWidget {
                     },
                   ),
                   Text(
-                    '${item.quantity ?? 1}',
+                    '${cart.quantity ?? 1}',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   IconButton(

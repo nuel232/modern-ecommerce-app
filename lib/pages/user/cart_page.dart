@@ -8,15 +8,9 @@ class CartPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Cart')),
-      body: Center(
-        child: Text(
-          'Cart Page',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-        ),
+      body: Expanded(
+        child: ListView.builder(itemBuilder: (context, index) => ,),
+     
       ),
     );
   }

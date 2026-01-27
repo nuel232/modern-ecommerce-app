@@ -10,17 +10,19 @@ class ForgotPasswordPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final TextEditingController emailController = TextEditingController();
 
-    void ResetPassword() async {
+    void resetPassword() async {
       final auth = AuthService();
 
       if (emailController.text.isEmpty) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('Enter your email Please')));
+        return;
       }
 
       try {
         await auth.sendPasswordResetEmail(emailController.text);
+        emailController.clear();
 
         showDialog(
           context: context,
@@ -32,7 +34,6 @@ class ForgotPasswordPage extends StatelessWidget {
           builder: (context) => AlertDialog(title: Text(e.toString())),
         );
       }
-      emailController.clear();
     }
 
     return Scaffold(
@@ -88,7 +89,7 @@ class ForgotPasswordPage extends StatelessWidget {
                   const SizedBox(height: 20),
                   MyButton(
                     text: 'Continue',
-                    onTap: () => ResetPassword(),
+                    onTap: () => resetPassword(),
                     borderRadius: BorderRadius.circular(15),
                   ),
                 ],
