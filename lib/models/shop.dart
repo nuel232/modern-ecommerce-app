@@ -150,7 +150,7 @@ class Shop extends ChangeNotifier {
       (item) => item.productId == product.productId,
     );
 
-    if (existingIndex != 1) {
+    if (existingIndex != -1) {
       //Products  exists, increase quantity
       final existing = _cart[existingIndex];
       _cart[existingIndex] = CartItem(
@@ -159,6 +159,7 @@ class Shop extends ChangeNotifier {
         productId: existing.productId,
         quantity: existing.quantity + 1,
       );
+      notifyListeners();
     } else {
       _cart.add(
         CartItem(
@@ -178,6 +179,12 @@ class Shop extends ChangeNotifier {
     notifyListeners();
   }
 
+  //clear the whole cart
+  void clearCart() {
+    _cart.clear();
+    notifyListeners();
+  }
+
   //update quantity
   void updateCartItemQuantity(String cartItemId, newQuantity) {
     final index = _cart.indexWhere((item) => item.cartItemId == cartItemId);
@@ -190,7 +197,7 @@ class Shop extends ChangeNotifier {
           cartItemId: item.cartItemId,
           isSelected: item.isSelected,
           productId: item.productId,
-          quantity: item.quantity,
+          quantity: newQuantity,
         );
       }
       notifyListeners();
@@ -204,7 +211,7 @@ class Shop extends ChangeNotifier {
       final item = _cart[index];
       _cart[index] = CartItem(
         cartItemId: item.cartItemId,
-        isSelected: item.isSelected,
+        isSelected: !item.isSelected,
         productId: item.productId,
         quantity: item.quantity,
       );
@@ -221,7 +228,7 @@ class Shop extends ChangeNotifier {
     }
   }
 
-  //calculate total price of selected item
+  //calculate total price of selected items
   double getCartTotal() {
     double total = 0.0;
     for (var cartItem in _cart) {

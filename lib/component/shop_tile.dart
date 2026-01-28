@@ -3,9 +3,16 @@ import 'package:morden_ecommerce_app/models/product.dart';
 import 'package:morden_ecommerce_app/models/shop.dart';
 import 'package:provider/provider.dart';
 
-class ShopTile extends StatelessWidget {
+class ShopTile extends StatefulWidget {
   final ProductModel product;
   const ShopTile({super.key, required this.product});
+
+  @override
+  State<ShopTile> createState() => _ShopTileState();
+}
+
+class _ShopTileState extends State<ShopTile> {
+  bool isAdded = false;
 
   void addToCart(BuildContext context) {
     //show dialog box
@@ -27,7 +34,7 @@ class ShopTile extends StatelessWidget {
               Navigator.pop(context);
 
               //add to cart
-              context.read<Shop>().addToCart(product);
+              context.read<Shop>().addToCart(widget.product);
             },
             child: Text('Yes'),
           ),
@@ -54,11 +61,10 @@ class ShopTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Product picture
-                // In shop_tile.dart - Line ~59
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
                   child: Image.asset(
-                    product.imagePath,
+                    widget.product.imagePath,
                     fit: BoxFit.cover,
                     width: double.infinity,
                     height: 150,
@@ -83,7 +89,7 @@ class ShopTile extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10.0),
                   child: Text(
-                    product.description,
+                    widget.product.description,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onPrimary,
                       fontSize: 12,
@@ -111,7 +117,7 @@ class ShopTile extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          product.name,
+                          widget.product.name,
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
@@ -122,7 +128,7 @@ class ShopTile extends StatelessWidget {
                         ),
                         SizedBox(height: 4),
                         Text(
-                          '₦${product.price.toStringAsFixed(2)}',
+                          '₦${widget.product.price.toStringAsFixed(2)}',
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onPrimary,
                             fontWeight: FontWeight.bold,
@@ -136,21 +142,73 @@ class ShopTile extends StatelessWidget {
                 //button to add to cart
                 GestureDetector(
                   onTap: () {
-                    return addToCart(context);
-                  },
-                  child: Container(
-                    padding: EdgeInsets.all(15),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[900],
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        bottomRight: Radius.circular(10),
+                    context.read<Shop>().addToCart(widget.product);
+
+                    // Trigger animation
+                    setState(() {
+                      isAdded = true;
+                    });
+
+                    // Reset animation after delay
+                    Future.delayed(const Duration(milliseconds: 400), () {
+                      if (mounted) {
+                        setState(() {
+                          isAdded = false;
+                        });
+                      }
+                    });
+
+                    //Bottom Sheet
+                    showModalBottomSheet(
+                      context: context,
+                      isDismissible: true,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(16),
+                        ),
                       ),
-                    ),
-                    child: Icon(
-                      Icons.add_shopping_cart,
-                      color: Colors.white,
-                      size: 20,
+                      builder: (_) {
+                        return Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            children: const [
+                              Icon(Icons.check_circle, color: Colors.green),
+                              SizedBox(width: 10),
+                              Text('Added to cart'),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+
+                    // ⏱ auto close after 2 seconds
+                    Future.delayed(const Duration(seconds: 2), () {
+                      if (Navigator.canPop(context)) {
+                        Navigator.pop(context);
+                      }
+                    });
+                  },
+                  child: AnimatedScale(
+                    scale: isAdded ? 1.4 : 1.0,
+                    duration: const Duration(milliseconds: 400),
+                    child: Container(
+                      padding: EdgeInsets.all(15),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[900],
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          bottomRight: Radius.circular(10),
+                        ),
+                      ),
+                      child: AnimatedScale(
+                        scale: isAdded ? 1.7 : 1.0,
+                        duration: const Duration(milliseconds: 400),
+                        child: Icon(
+                          Icons.add_shopping_cart,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
                     ),
                   ),
                 ),

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:morden_ecommerce_app/component/cart_items_tile.dart';
+import 'package:morden_ecommerce_app/component/my_button.dart';
 import 'package:morden_ecommerce_app/models/cart_item.dart';
 import 'package:morden_ecommerce_app/models/shop.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +19,34 @@ class CartPage extends StatelessWidget {
         title: Text('Cart'),
         actions: [
           if (CartItems.isNotEmpty)
-            TextButton(onPressed: () {}, child: Text('Clear')),
+            TextButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text('Clear Cart?'),
+                    content: Text('Are you sure you want to remove all items?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          shop.clearCart();
+                        },
+                        child: Text(
+                          'Clear',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+              child: Text('Clear'),
+            ),
         ],
       ),
       body: CartItems.isEmpty
@@ -64,6 +92,14 @@ class CartPage extends StatelessWidget {
                         cartItem: CartItem,
                       );
                     },
+                  ),
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 15.0),
+                  child: MyButton(
+                    text: 'Checkout (${shop.getCartTotal()})',
+                    onTap: () {},
                   ),
                 ),
               ],
