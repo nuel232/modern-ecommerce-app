@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
+import 'package:morden_ecommerce_app/models/cart_item.dart';
 
 import 'package:morden_ecommerce_app/models/product.dart';
+import 'package:uuid/uuid.dart';
 
 class Shop extends ChangeNotifier {
   final List<ProductModel> _shop = [
@@ -133,23 +135,103 @@ class Shop extends ChangeNotifier {
   ];
 
   //user cart
-  final List<ProductModel> _cart = [];
+  final List<CartItem> _cart = [];
 
   //get the the ProductModels and the cart
   List<ProductModel> get shop => _shop;
 
   //get the ProductModels int t  he cart
-  List<ProductModel> get cart => _cart;
+  List<CartItem> get cart => _cart;
 
-  //add to cart
-  void addToCart(ProductModel item) {
-    _cart.add(item);
-    notifyListeners();
+  //add to cart - Create a CartItem
+  void addToCart(ProductModel product) {
+    //check if product already exists in cart
+    final existingIndex = _cart.indexWhere(
+      (item) => item.productId == product.productId,
+    );
+
+    if (existingIndex != 1) {
+      //Products  exists, increase quantity
+      final existing = _cart[existingIndex];
+      _cart[existingIndex] = CartItem(
+        cartItemId: existing.cartItemId,
+        isSelected: existing.isSelected,
+        productId: existing.productId,
+        quantity: existing.quantity + 1,
+      );
+    } else {
+      _cart.add(
+        CartItem(
+          cartItemId: Uuid().v4(),
+          isSelected: true,
+          productId: product.productId,
+          quantity: 1,
+        ),
+      );
+      notifyListeners();
+    }
   }
 
   //remove from cart
-  void removeFromCart(ProductModel item) {
-    _cart.remove(item);
+  void removeFromCart(CartItem cartItem) {
+    _cart.removeWhere((item) => item.cartItemId == cartItem.cartItemId);
     notifyListeners();
+  }
+
+  //update quantity
+  void updateCartItemQuantity(String cartItemId, newQuantity) {
+    final index = _cart.indexWhere((item) => item.cartItemId == cartItemId);
+    if (index != -1) {
+      if (newQuantity <= 0) {
+        _cart.removeAt(index);
+      } else {
+        final item = _cart[index];
+        _cart[index] = CartItem(
+          cartItemId: item.cartItemId,
+          isSelected: item.isSelected,
+          productId: item.productId,
+          quantity: item.quantity,
+        );
+      }
+      notifyListeners();
+    }
+  }
+
+  //toggle cart item selection
+  void toggleCartItemSelection(String cartItemId) {
+    final index = _cart.indexWhere((item) => item.cartItemId == cartItemId);
+    if (index != -1) {
+      final item = _cart[index];
+      _cart[index] = CartItem(
+        cartItemId: item.cartItemId,
+        isSelected: item.isSelected,
+        productId: item.productId,
+        quantity: item.quantity,
+      );
+      notifyListeners();
+    }
+  }
+
+  //Get product by ID (helper method for cart page)
+  ProductModel? getProductById(String productId) {
+    try {
+      return _shop.firstWhere((product) => product.productId == productId);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  //calculate total price of selected item
+  double getCartTotal() {
+    double total = 0.0;
+    for (var cartItem in _cart) {
+      if (cartItem.isSelected) {
+        final product = getProductById(cartItem.productId);
+        if (product != null) {
+          total += product.price * cartItem.quantity;
+        }
+      }
+    }
+    return total;
   }
 }

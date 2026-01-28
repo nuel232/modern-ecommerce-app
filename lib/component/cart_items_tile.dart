@@ -5,14 +5,19 @@ import 'package:morden_ecommerce_app/models/shop.dart';
 import 'package:provider/provider.dart';
 
 class CartItemsTile extends StatelessWidget {
-  final ProductModel item;
-  final CartItem cart;
+  final ProductModel product;
+  final CartItem cartItem;
 
-  const CartItemsTile({super.key, required this.item, required this.cart});
+  const CartItemsTile({
+    super.key,
+    required this.product,
+    required this.cartItem,
+  });
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final shop = context.read<Shop>();
 
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -25,9 +30,9 @@ class CartItemsTile extends StatelessWidget {
         children: [
           // Checkbox
           Checkbox(
-            value: cart.isSelected,
+            value: cartItem.isSelected,
             onChanged: (value) {
-              // TODO: Toggle selection
+              shop.toggleCartItemSelection(cartItem.cartItemId);
             },
           ),
 
@@ -35,10 +40,18 @@ class CartItemsTile extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: Image.asset(
-              item.imagePath,
+              product.imagePath,
               width: 60,
               height: 60,
               fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  width: 60,
+                  height: 60,
+                  color: colorScheme.onPrimary,
+                  child: Icon(Icons.broken_image),
+                );
+              },
             ),
           ),
 
@@ -50,14 +63,14 @@ class CartItemsTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  item.name,
+                  product.name,
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(height: 4),
                 Text(
-                  '₦${item.price.toStringAsFixed(2)}',
+                  '₦${product.price.toStringAsFixed(2)}',
                   style: TextStyle(
                     color: Colors.green,
                     fontWeight: FontWeight.bold,
@@ -76,17 +89,23 @@ class CartItemsTile extends StatelessWidget {
                   IconButton(
                     icon: Icon(Icons.remove_circle_outline, size: 20),
                     onPressed: () {
-                      // TODO: Decrease quantity
+                      shop.updateCartItemQuantity(
+                        cartItem.cartItemId,
+                        cartItem.quantity - 1,
+                      );
                     },
                   ),
                   Text(
-                    '${cart.quantity ?? 1}',
+                    '${cartItem.quantity}',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   IconButton(
                     icon: Icon(Icons.add_circle_outline, size: 20),
                     onPressed: () {
-                      // TODO: Increase quantity
+                      shop.updateCartItemQuantity(
+                        cartItem.cartItemId,
+                        cartItem.quantity + 1,
+                      );
                     },
                   ),
                 ],
@@ -95,7 +114,7 @@ class CartItemsTile extends StatelessWidget {
                 icon: Icon(Icons.delete_outline, color: Colors.red),
                 onPressed: () {
                   // Remove from cart
-                  context.read<Shop>().removeFromCart(item);
+                  shop.removeFromCart(cartItem);
                 },
               ),
             ],

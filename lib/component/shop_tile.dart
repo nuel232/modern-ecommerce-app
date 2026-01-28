@@ -63,7 +63,6 @@ class ShopTile extends StatelessWidget {
                     width: double.infinity,
                     height: 150,
                     errorBuilder: (context, error, stackTrace) {
-                    
                       return Container(
                         width: double.infinity,
                         height: 150,
@@ -84,7 +83,7 @@ class ShopTile extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10.0),
                   child: Text(
-                    product.description ?? 'No description',
+                    product.description,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onPrimary,
                       fontSize: 12,
