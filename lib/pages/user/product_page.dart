@@ -41,7 +41,7 @@ class _ProductPageState extends State<ProductPage> {
               title: Text(
                 'Shop',
                 style: TextStyle(
-                  color: colorScheme.onSurface,
+                  color: colorScheme.onPrimary,
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
@@ -194,9 +194,10 @@ class _SearchBarDelegate extends SliverPersistentHeaderDelegate {
               ),
               child: TextField(
                 controller: searchController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   border: InputBorder.none,
                   hintText: 'Search...',
+                  hintStyle: TextStyle(color: colorScheme.onPrimary),
                   prefixIcon: Icon(Icons.search, size: 20),
                   contentPadding: EdgeInsets.symmetric(
                     horizontal: 16,
@@ -217,7 +218,7 @@ class _SearchBarDelegate extends SliverPersistentHeaderDelegate {
             child: IconButton(
               icon: Icon(
                 Icons.shopping_cart_outlined,
-                color: colorScheme.onSurface,
+                color: colorScheme.onPrimary,
               ),
               onPressed: onCartPressed,
             ),
