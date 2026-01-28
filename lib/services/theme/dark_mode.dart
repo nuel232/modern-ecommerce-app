@@ -7,8 +7,12 @@ ThemeData darkMode = ThemeData(
     tertiary: Color.fromARGB(255, 80, 86, 99),
     secondary: Color.fromARGB(255, 32, 39, 49),
     onSecondary: Colors.white,
-    onPrimary: Color.fromARGB(255, 183, 191, 199),
+    onPrimary: Color.fromARGB(255, 206, 211, 216),
     onSurface: Color.fromARGB(255, 118, 127, 137),
     inverseSurface: Color.fromARGB(255, 217, 221, 226),
+  ),
+  textTheme: ThemeData.dark().textTheme.apply(
+    bodyColor: const Color.fromARGB(255, 206, 211, 216),
+    displayColor: const Color.fromARGB(255, 206, 211, 216),
   ),
 );

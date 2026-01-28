@@ -10,4 +10,9 @@ ThemeData lightMode = ThemeData(
     onPrimary: Color.fromARGB(255, 47, 52, 60),
     onSurface: Color.fromARGB(255, 139, 151, 168),
   ),
+
+  textTheme: ThemeData.light().textTheme.apply(
+    bodyColor: const Color.fromARGB(255, 47, 52, 60),
+    displayColor: const Color.fromARGB(255, 47, 52, 60),
+  ),
 );
