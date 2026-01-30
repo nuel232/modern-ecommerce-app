@@ -6,9 +6,10 @@ import 'package:uuid/uuid.dart';
 
 class Shop extends ChangeNotifier {
   final List<ProductModel> _shop = [
-    // ===== SHOES =====
+    // ===== SHOES (Cat_001) =====
     ProductModel(
       productId: '1',
+      categoryId: 'Cat_001',
       name: 'Air Deldon',
       description: 'Built to break barriers, made for all athletes.',
       price: 160000,
@@ -18,6 +19,7 @@ class Shop extends ChangeNotifier {
 
     ProductModel(
       productId: '2',
+      categoryId: 'Cat_001',
       name: 'G.T. Cut 3',
       description: 'Engineered for explosive guards.',
       price: 115000,
@@ -27,6 +29,7 @@ class Shop extends ChangeNotifier {
 
     ProductModel(
       productId: '3',
+      categoryId: 'Cat_001',
       name: 'Tatum 3 Tie-Dye',
       description: 'Unleash your creativity with the Tatum 3.',
       price: 110000,
@@ -36,6 +39,7 @@ class Shop extends ChangeNotifier {
 
     ProductModel(
       productId: '4',
+      categoryId: 'Cat_001',
       name: 'Tatum 3 Tie-Dye (Alt)',
       description: 'Bold colors meet elite performance.',
       price: 110000,
@@ -45,6 +49,7 @@ class Shop extends ChangeNotifier {
 
     ProductModel(
       productId: '5',
+      categoryId: 'Cat_001',
       name: 'Zoom Freak 4',
       description: 'Dominate like Giannis in the Nike Zoom Freak 4.',
       price: 130000,
@@ -54,6 +59,7 @@ class Shop extends ChangeNotifier {
 
     ProductModel(
       productId: '6',
+      categoryId: 'Cat_001',
       name: 'Black Shoe Air',
       description: 'Clean black design with everyday comfort.',
       price: 95000,
@@ -63,6 +69,7 @@ class Shop extends ChangeNotifier {
 
     ProductModel(
       productId: '7',
+      categoryId: 'Cat_001',
       name: 'H-Penny Sneakers',
       description: 'Classic street-style sneakers with comfort.',
       price: 105000,
@@ -72,6 +79,7 @@ class Shop extends ChangeNotifier {
 
     ProductModel(
       productId: '8',
+      categoryId: 'Cat_001',
       name: 'Brandon Step Loafer',
       description: 'Premium loafers for smart and casual wear.',
       price: 85000,
@@ -81,6 +89,7 @@ class Shop extends ChangeNotifier {
 
     ProductModel(
       productId: '9',
+      categoryId: 'Cat_001',
       name: 'Craft Arlo Lace',
       description: 'Handcrafted lace shoes with modern elegance.',
       price: 98000,
@@ -88,9 +97,9 @@ class Shop extends ChangeNotifier {
       imagePath: 'lib/Images/Craft-Arlo-Lace.jpeg',
     ),
 
-    // ===== ACCESSORIES =====
     ProductModel(
       productId: '10',
+      categoryId: 'Cat_002',
       name: 'Adwin Cap',
       description: 'Stylish cap for casual and sporty outfits.',
       price: 18000,
@@ -98,8 +107,10 @@ class Shop extends ChangeNotifier {
       imagePath: 'lib/Images/Aldwin-Cap.jpg',
     ),
 
+    // ===== ACCESSORIES (Cat_002) =====
     ProductModel(
       productId: '11',
+      categoryId: 'Cat_002',
       name: 'Classic Glasses',
       description: 'Fashion-forward glasses for daily wear.',
       price: 25000,
@@ -107,8 +118,10 @@ class Shop extends ChangeNotifier {
       imagePath: 'lib/Images/Glasses.jpg',
     ),
 
+    // ===== SHIRTS / CLOTHING (Cat_003) =====
     ProductModel(
       productId: '12',
+      categoryId: 'Cat_003',
       name: 'Poplin Classic Fit Shirt',
       description: 'Comfortable classic-fit shirt for all occasions.',
       price: 42000,
@@ -118,14 +131,17 @@ class Shop extends ChangeNotifier {
 
     ProductModel(
       productId: '13',
+      categoryId: 'Cat_003',
       name: 'Silk Cotton Blend Shirt',
       description: 'Soft silk-cotton blend for premium comfort.',
       price: 48000,
       stock: 9,
       imagePath: 'lib/Images/SILK-COTTON-BLEND-SHIRT.png',
     ),
+
     ProductModel(
       productId: '14',
+      categoryId: 'Cat_003',
       name: 'Silk Cotton Blend Shirt',
       description: 'Soft silk-cotton blend for premium comfort.',
       price: 48000,

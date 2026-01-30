@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:morden_ecommerce_app/component/cart_items_tile.dart';
 import 'package:morden_ecommerce_app/component/my_button.dart';
 import 'package:morden_ecommerce_app/models/cart_item.dart';
@@ -74,35 +75,49 @@ class CartPage extends StatelessWidget {
                 ],
               ),
             )
-          : Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: CartItems.length,
-                    itemBuilder: (context, index) {
-                      final CartItem = CartItems[index];
-                      final product = shop.getProductById(CartItem.productId);
+          : SafeArea(
+              child: Column(
+                children: [
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: CartItems.length,
+                      itemBuilder: (context, index) {
+                        final CartItem = CartItems[index];
+                        final product = shop.getProductById(CartItem.productId);
 
-                      if (product == null) {
-                        return SizedBox();
-                      }
+                        if (product == null) {
+                          return SizedBox();
+                        }
 
-                      return CartItemsTile(
-                        product: product,
-                        cartItem: CartItem,
-                      );
-                    },
+                        return CartItemsTile(
+                              product: product,
+                              cartItem: CartItem,
+                            )
+                            .animate()
+                            .fadeIn(
+                              delay: 200.ms,
+                              duration: 600.ms,
+                              curve: Curves.fastEaseInToSlowEaseOut,
+                            )
+                            .moveY(begin: 100);
+                      },
+                    ),
                   ),
-                ),
 
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 15.0),
-                  child: MyButton(
-                    text: 'Checkout (${shop.getCartTotal()})',
-                    onTap: () {},
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 15.0),
+                    child:
+                        MyButton(
+                          text: 'Checkout (${shop.getCartTotal()})',
+                          onTap: () {},
+                        ).animate().fadeIn(
+                          delay: 200.ms,
+                          duration: 600.ms,
+                          curve: Curves.fastEaseInToSlowEaseOut,
+                        ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
     );
   }

@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:morden_ecommerce_app/component/my_nav_bar.dart';
 import 'package:morden_ecommerce_app/pages/user/cart_page.dart';
-import 'package:morden_ecommerce_app/pages/user/product_page.dart';
+import 'package:morden_ecommerce_app/pages/user/Product_page/product_page.dart';
 import 'package:morden_ecommerce_app/pages/user/profile_page.dart';
 import 'package:morden_ecommerce_app/pages/user/settings_page.dart';
 
@@ -36,14 +36,16 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: MyNavBar(
-        onTabChange: (index) => navigateButtomBar(index),
-        text: 'Shop',
-        icon: Icons.shopping_bag,
-        text2: "cart",
-        icon2: Icons.shopping_cart_outlined,
-        text3: "Profile",
-        icon3: Icons.person,
+      bottomNavigationBar: SafeArea(
+        child: MyNavBar(
+          onTabChange: (index) => navigateButtomBar(index),
+          text: 'Shop',
+          icon: Icons.shopping_bag,
+          text2: "cart",
+          icon2: Icons.shopping_cart_outlined,
+          text3: "Profile",
+          icon3: Icons.person,
+        ),
       ),
 
       backgroundColor: Theme.of(context).colorScheme.surface,

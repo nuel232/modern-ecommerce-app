@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:morden_ecommerce_app/models/product.dart';
 import 'package:morden_ecommerce_app/models/shop.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ShopTile extends StatefulWidget {
   final ProductModel product;
@@ -90,7 +91,7 @@ class _ShopTileState extends State<ShopTile> {
                   padding: const EdgeInsets.symmetric(horizontal: 10.0),
                   child: Text(
                     widget.product.description,
-                    style: TextStyle(
+                    style: GoogleFonts.montserrat(
                       color: Theme.of(context).colorScheme.onPrimary,
                       fontSize: 12,
                     ),
