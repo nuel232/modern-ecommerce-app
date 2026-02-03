@@ -4,10 +4,11 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:morden_ecommerce_app/component/shop_tile.dart';
 import 'package:morden_ecommerce_app/models/shop.dart';
-import 'package:morden_ecommerce_app/pages/user/Product_page/category_chip_widgets.dart';
+import 'package:morden_ecommerce_app/pages/user/Product_page/widgets/category_chip_widgets.dart';
 import 'package:morden_ecommerce_app/pages/user/Product_page/widgets/search_bar_delegate.dart';
 import 'package:morden_ecommerce_app/pages/user/cart_page.dart';
 import 'package:provider/provider.dart';
+import 'package:morden_ecommerce_app/models/category_model.dart';
 
 class ProductPage extends StatefulWidget {
   const ProductPage({super.key});
@@ -18,7 +19,7 @@ class ProductPage extends StatefulWidget {
 
 class _ProductPageState extends State<ProductPage> {
   final TextEditingController searchController = TextEditingController();
-  String? selectedCategory = 'Cat_000';
+  String selectedCategory = 'Cat_000';
 
   @override
   void dispose() {
@@ -29,7 +30,7 @@ class _ProductPageState extends State<ProductPage> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final products = context.watch<Shop>().shop;
+    final products = context.watch<Shop>();
     final allProducts = products.shop; // For Hot Picks
     final filteredProducts = products.getProductsByCategory(
       selectedCategory,
@@ -111,9 +112,9 @@ class _ProductPageState extends State<ProductPage> {
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 16,
                                 ),
-                                itemCount: products.length,
+                                itemCount: allProducts.length,
                                 itemBuilder: (context, index) {
-                                  final product = products[index];
+                                  final product = allProducts[index];
                                   return Container(
                                     width: 180,
                                     margin: const EdgeInsets.only(right: 16),
@@ -166,7 +167,7 @@ class _ProductPageState extends State<ProductPage> {
                               });
                             },
                           );
-                        }),
+                        }).toList(),
                       ),
                     ),
                   ),
@@ -184,7 +185,7 @@ class _ProductPageState extends State<ProductPage> {
                           ),
                       delegate: SliverChildBuilderDelegate((context, index) {
                         try {
-                          final product = products[index];
+                          final product = filteredProducts[index];
                           return ShopTile(product: product);
                         } catch (e) {
                           print('Error rendering product at index $index: $e');
@@ -193,7 +194,7 @@ class _ProductPageState extends State<ProductPage> {
                             child: Center(child: Text('Error loading product')),
                           );
                         }
-                      }, childCount: products.length),
+                      }, childCount: filteredProducts.length),
                     ),
                   ),
                 ],

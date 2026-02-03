@@ -26,6 +26,21 @@ class CategoryChipWidgets extends StatelessWidget {
           color: isSelected
               ? Theme.of(context).colorScheme.secondary
               : Theme.of(context).colorScheme.primary,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected
+                ? Theme.of(context).colorScheme.secondary
+                : Theme.of(context).colorScheme.tertiary.withOpacity(0.3),
+          ),
+        ),
+        child: Text(
+          categoryName,
+          style: TextStyle(
+            color: isSelected
+                ? Theme.of(context).colorScheme.onSecondary
+                : Theme.of(context).colorScheme.onPrimary,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          ),
         ),
       ),
     );
