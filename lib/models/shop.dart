@@ -257,4 +257,13 @@ class Shop extends ChangeNotifier {
     }
     return total;
   }
+
+  // Filter products by category
+  List<ProductModel> getProductsByCategory(String categoryId) {
+    if (categoryId == 'Cat_000') {
+      // 'All' category
+      return _shop;
+    }
+    return _shop.where((product) => product.categoryId == categoryId).toList();
+  }
 }

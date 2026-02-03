@@ -1,7 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:morden_ecommerce_app/component/shop_tile.dart';
 import 'package:morden_ecommerce_app/models/shop.dart';
+import 'package:morden_ecommerce_app/pages/user/Product_page/category_chip_widgets.dart';
+import 'package:morden_ecommerce_app/pages/user/Product_page/widgets/search_bar_delegate.dart';
 import 'package:morden_ecommerce_app/pages/user/cart_page.dart';
 import 'package:provider/provider.dart';
 
@@ -14,6 +18,7 @@ class ProductPage extends StatefulWidget {
 
 class _ProductPageState extends State<ProductPage> {
   final TextEditingController searchController = TextEditingController();
+  String? selectedCategory = 'Cat_000';
 
   @override
   void dispose() {
@@ -25,6 +30,10 @@ class _ProductPageState extends State<ProductPage> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final products = context.watch<Shop>().shop;
+    final allProducts = products.shop; // For Hot Picks
+    final filteredProducts = products.getProductsByCategory(
+      selectedCategory,
+    ); // For All Products
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -55,7 +64,7 @@ class _ProductPageState extends State<ProductPage> {
                   // Fixed search bar and cart icon
                   SliverPersistentHeader(
                     pinned: true,
-                    delegate: _SearchBarDelegate(
+                    delegate: SearchBarDelegate(
                       colorScheme: colorScheme,
                       searchController: searchController,
                       onCartPressed: () {
@@ -138,6 +147,30 @@ class _ProductPageState extends State<ProductPage> {
                       ),
                     ),
                   ),
+
+                  SliverToBoxAdapter(
+                    child: Container(
+                      height: 50,
+                      margin: EdgeInsets.only(bottom: 16),
+                      child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        children: _Categorys.map((category) {
+                          return CategoryChipWidgets(
+                            categoryId: category.categoryId,
+                            categoryName: category.name,
+                            isSelected: selectedCategory == category.categoryId,
+                            onTap: () {
+                              setState(() {
+                                selectedCategory = category.categoryId;
+                              });
+                            },
+                          );
+                        }),
+                      ),
+                    ),
+                  ),
+
                   // All Products Grid
                   SliverPadding(
                     padding: const EdgeInsets.all(16),
@@ -173,85 +206,5 @@ class _ProductPageState extends State<ProductPage> {
               )
               .moveY(begin: 100),
     );
-  }
-}
-
-// Custom delegate for the search bar
-class _SearchBarDelegate extends SliverPersistentHeaderDelegate {
-  final ColorScheme colorScheme;
-  final TextEditingController searchController;
-  final VoidCallback onCartPressed;
-
-  _SearchBarDelegate({
-    required this.colorScheme,
-    required this.searchController,
-    required this.onCartPressed,
-  });
-
-  @override
-  double get minExtent => 64.0;
-
-  @override
-  double get maxExtent => 64.0;
-
-  @override
-  Widget build(
-    BuildContext context,
-    double shrinkOffset,
-    bool overlapsContent,
-  ) {
-    return Container(
-      height: 64.0,
-      color: colorScheme.surface,
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-      child: Row(
-        children: [
-          Expanded(
-            child: Container(
-              height: 48,
-              decoration: BoxDecoration(
-                color: colorScheme.primary,
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: TextField(
-                controller: searchController,
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  hintText: 'Search...',
-                  hintStyle: TextStyle(color: colorScheme.onPrimary),
-                  prefixIcon: Icon(Icons.search, size: 20),
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: colorScheme.primary,
-              shape: BoxShape.circle,
-            ),
-            child: IconButton(
-              icon: Icon(
-                Icons.shopping_cart_outlined,
-                color: colorScheme.onPrimary,
-              ),
-              onPressed: onCartPressed,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  @override
-  bool shouldRebuild(covariant _SearchBarDelegate oldDelegate) {
-    return oldDelegate.colorScheme != colorScheme ||
-        oldDelegate.searchController != searchController;
   }
 }
