@@ -149,6 +149,7 @@ class _ProductPageState extends State<ProductPage> {
                     ),
                   ),
 
+                  // Category Chips
                   SliverToBoxAdapter(
                     child: Container(
                       height: 50,
@@ -156,7 +157,7 @@ class _ProductPageState extends State<ProductPage> {
                       child: ListView(
                         scrollDirection: Axis.horizontal,
                         padding: EdgeInsets.symmetric(horizontal: 16),
-                        children: _Categorys.map((category) {
+                        children: categories.map((category) {
                           return CategoryChipWidgets(
                             categoryId: category.categoryId,
                             categoryName: category.name,

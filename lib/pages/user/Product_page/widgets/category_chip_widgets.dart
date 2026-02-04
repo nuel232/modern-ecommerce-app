@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class CategoryChipWidgets extends StatelessWidget {
   final String categoryId;
@@ -21,16 +22,16 @@ class CategoryChipWidgets extends StatelessWidget {
       onTap: onTap,
       child: Container(
         margin: EdgeInsets.only(right: 12),
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
         decoration: BoxDecoration(
           color: isSelected
               ? Theme.of(context).colorScheme.secondary
-              : Theme.of(context).colorScheme.primary,
+              : Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isSelected
                 ? Theme.of(context).colorScheme.secondary
-                : Theme.of(context).colorScheme.tertiary.withOpacity(0.3),
+                : Theme.of(context).colorScheme.surface.withOpacity(0.3),
           ),
         ),
         child: Text(

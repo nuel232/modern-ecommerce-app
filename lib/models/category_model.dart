@@ -30,7 +30,7 @@ class CategoryModel {
   }
 }
 
-final List<CategoryModel> _Categorys = [
+final List<CategoryModel> categories = [
   CategoryModel(categoryId: 'Cat_000', name: "All"),
   CategoryModel(categoryId: 'Cat_001', name: "Shoe"),
   CategoryModel(categoryId: 'Cat_002', name: "Accessories"),
