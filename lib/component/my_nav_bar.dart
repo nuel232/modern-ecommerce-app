@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:badges/badges.dart' as badges;
 
 class MyNavBar extends StatelessWidget {
   final Function(int)? onTabChange;
@@ -9,6 +10,7 @@ class MyNavBar extends StatelessWidget {
   final IconData icon;
   final IconData icon2;
   final IconData icon3;
+  final int? cartItemCount;
   const MyNavBar({
     super.key,
     required this.onTabChange,
@@ -18,6 +20,7 @@ class MyNavBar extends StatelessWidget {
     required this.icon,
     required this.icon2,
     required this.icon3,
+    this.cartItemCount,
   });
 
   @override
@@ -37,7 +40,27 @@ class MyNavBar extends StatelessWidget {
 
         tabs: [
           GButton(icon: icon, text: text),
-          GButton(icon: icon2, text: text2),
+          GButton(
+            icon: icon2,
+            text: text2,
+            leading: cartItemCount != null && cartItemCount! > 0
+                ? Badge(
+                    label: Text(
+                      cartItemCount! > 99 ? '99+' : '$cartItemCount',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 7,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    backgroundColor: Theme.of(context).colorScheme.secondary,
+                    child: Icon(
+                      icon2,
+                      color: Theme.of(context).colorScheme.inversePrimary,
+                    ),
+                  )
+                : null,
+          ),
           GButton(icon: icon3, text: text3),
         ],
       ),

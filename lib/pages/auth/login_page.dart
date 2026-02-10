@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:morden_ecommerce_app/component/my_button.dart';
 import 'package:morden_ecommerce_app/component/my_textfield.dart';
 import 'package:morden_ecommerce_app/pages/user/forgot_password_page.dart';
@@ -75,9 +76,9 @@ class _LoginPageState extends State<LoginPage> {
                 //text
                 Text(
                   'Welcome back,we have missed you',
-                  style: TextStyle(
+                  style: GoogleFonts.dmSans(
                     color: Theme.of(context).colorScheme.onSurface,
-                    fontWeight: FontWeight.bold,
+                    // fontWeight: FontWeight.bold,
                     fontSize: 18,
                   ),
                 ),
@@ -134,7 +135,7 @@ class _LoginPageState extends State<LoginPage> {
                 //login button
                 MyButton(
                   text: 'Login',
-                  textStyle: TextStyle(
+                  textStyle: GoogleFonts.poppins(
                     fontSize: 18,
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -150,7 +151,7 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     Text(
                       "Don't have an account?",
-                      style: TextStyle(
+                      style: GoogleFonts.dmSans(
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
@@ -158,7 +159,7 @@ class _LoginPageState extends State<LoginPage> {
                       onTap: widget.onTap,
                       child: Text(
                         ' Register now',
-                        style: TextStyle(
+                        style: GoogleFonts.dmSans(
                           color: Theme.of(context).colorScheme.onSurface,
                           fontWeight: FontWeight.bold,
                         ),

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CategoryChipWidgets extends StatelessWidget {
   final String categoryId;
@@ -22,7 +23,7 @@ class CategoryChipWidgets extends StatelessWidget {
       onTap: onTap,
       child: Container(
         margin: EdgeInsets.only(right: 12),
-        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 0),
         decoration: BoxDecoration(
           color: isSelected
               ? Theme.of(context).colorScheme.secondary
@@ -36,7 +37,7 @@ class CategoryChipWidgets extends StatelessWidget {
         ),
         child: Text(
           categoryName,
-          style: TextStyle(
+          style: GoogleFonts.dmSans(
             color: isSelected
                 ? Theme.of(context).colorScheme.onSecondary
                 : Theme.of(context).colorScheme.onPrimary,

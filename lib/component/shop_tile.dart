@@ -91,7 +91,7 @@ class _ShopTileState extends State<ShopTile> {
                   padding: const EdgeInsets.symmetric(horizontal: 10.0),
                   child: Text(
                     widget.product.description,
-                    style: GoogleFonts.montserrat(
+                    style: GoogleFonts.dmSans(
                       color: Theme.of(context).colorScheme.onPrimary,
                       fontSize: 12,
                     ),
@@ -119,7 +119,7 @@ class _ShopTileState extends State<ShopTile> {
                       children: [
                         Text(
                           widget.product.name,
-                          style: TextStyle(
+                          style: GoogleFonts.dmSans(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                             color: Theme.of(context).colorScheme.onPrimary,
@@ -130,7 +130,7 @@ class _ShopTileState extends State<ShopTile> {
                         SizedBox(height: 4),
                         Text(
                           '₦${widget.product.price.toStringAsFixed(2)}',
-                          style: TextStyle(
+                          style: GoogleFonts.dmSans(
                             color: Theme.of(context).colorScheme.onPrimary,
                             fontWeight: FontWeight.bold,
                           ),
@@ -195,7 +195,9 @@ class _ShopTileState extends State<ShopTile> {
                     child: Container(
                       padding: EdgeInsets.all(15),
                       decoration: BoxDecoration(
-                        color: Colors.grey[900],
+                        // color: Colors.grey[900],
+                        color: Theme.of(context).colorScheme.secondary,
+
                         borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(20),
                           bottomRight: Radius.circular(10),

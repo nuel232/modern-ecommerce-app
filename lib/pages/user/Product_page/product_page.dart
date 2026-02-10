@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:morden_ecommerce_app/component/shop_tile.dart';
 import 'package:morden_ecommerce_app/models/shop.dart';
 import 'package:morden_ecommerce_app/pages/user/Product_page/widgets/category_chip_widgets.dart';
@@ -140,7 +141,7 @@ class _ProductPageState extends State<ProductPage> {
                       padding: const EdgeInsets.fromLTRB(16, 24, 16, 12),
                       child: Text(
                         'All Products',
-                        style: TextStyle(
+                        style: GoogleFonts.dmSans(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: colorScheme.onPrimary,
@@ -152,7 +153,7 @@ class _ProductPageState extends State<ProductPage> {
                   // Category Chips
                   SliverToBoxAdapter(
                     child: Container(
-                      height: 50,
+                      height: 28,
                       margin: EdgeInsets.only(bottom: 16),
                       child: ListView(
                         scrollDirection: Axis.horizontal,

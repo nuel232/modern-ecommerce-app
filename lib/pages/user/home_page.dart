@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:morden_ecommerce_app/component/my_nav_bar.dart';
+import 'package:morden_ecommerce_app/models/shop.dart';
 import 'package:morden_ecommerce_app/pages/user/cart_page.dart';
 import 'package:morden_ecommerce_app/pages/user/Product_page/product_page.dart';
 import 'package:morden_ecommerce_app/pages/user/profile_page.dart';
 import 'package:morden_ecommerce_app/pages/user/settings_page.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -35,6 +37,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    // Get cart item count from Shop provider
+    final shop = context.watch<Shop>();
+    final cartItemCount = shop.cart.length;
     return Scaffold(
       bottomNavigationBar: SafeArea(
         child: MyNavBar(
@@ -43,6 +48,7 @@ class _HomePageState extends State<HomePage> {
           icon: Icons.shopping_bag,
           text2: "cart",
           icon2: Icons.shopping_cart_outlined,
+          cartItemCount: cartItemCount,
           text3: "Profile",
           icon3: Icons.person,
         ),
