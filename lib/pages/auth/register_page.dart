@@ -14,6 +14,7 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -40,6 +41,7 @@ class _RegisterPageState extends State<RegisterPage> {
         await _authservice.signUpWithEmailAndPassword(
           emailController.text,
           passwordController.text,
+          name: nameController.text,
         );
         // Dismiss the loading dialog after sign-up completes
         if (context.mounted) {
@@ -100,6 +102,15 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
 
                 SizedBox(height: 20),
+
+                //Users's name
+                MyTextfield(
+                  controller: nameController,
+                  hintText: 'Full Name...',
+                  obscureText: false,
+                ),
+
+                SizedBox(height: 10),
 
                 //email textfield
                 MyTextfield(

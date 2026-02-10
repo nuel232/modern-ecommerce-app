@@ -44,8 +44,9 @@ class AuthService {
   //signUp
   Future<UserCredential> signUpWithEmailAndPassword(
     String email,
-    password, {
+    String password, {
     String role = "user",
+    String name = "",
   }) async {
     try {
       UserCredential userCredential = await _auth
@@ -55,7 +56,9 @@ class AuthService {
       UserModel newUser = UserModel(
         uid: userCredential.user!.uid,
         email: email,
+        name: name,
         role: role,
+        addresses: [],
       );
 
       // Save to Firestore

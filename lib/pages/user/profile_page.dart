@@ -1,6 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:morden_ecommerce_app/component/my_button.dart';
+import 'package:morden_ecommerce_app/models/user.dart';
 import 'package:morden_ecommerce_app/pages/user/settings_page.dart';
 import 'package:morden_ecommerce_app/services/auth/auth_service.dart';
 
@@ -35,76 +38,95 @@ class ProfilePage extends StatelessWidget {
         ],
       ),
 
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
+      body: StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('users')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (!snapshot.hasData || !snapshot.data!.exists) {
+            return const Center(child: Text('User data not found'));
+          }
+
+          final user = UserModel.fromMap(
+            snapshot.data!.data() as Map<String, dynamic>,
+          );
+
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                //icon
-                CircleAvatar(
-                  backgroundColor: Theme.of(context).colorScheme.secondary,
-                  radius: 70,
-                  child: Icon(
-                    CupertinoIcons.person,
-                    size: 70,
-                    color: Theme.of(context).colorScheme.surface,
-                  ),
-                  // color: Colors.white,
+                Column(
+                  children: [
+                    //icon
+                    CircleAvatar(
+                      backgroundColor: Theme.of(context).colorScheme.secondary,
+                      radius: 70,
+                      child: Icon(
+                        CupertinoIcons.person,
+                        size: 70,
+                        color: Theme.of(context).colorScheme.surface,
+                      ),
+                      // color: Colors.white,
+                    ),
+
+                    SizedBox(height: 20),
+
+                    Text(
+                      user.name.isNotEmpty ? user.name : 'profile',
+                      style: TextStyle(
+                        fontSize: 35,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
+
+                    SizedBox(height: 10),
+                    Container(
+                      margin: EdgeInsets.all(20),
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
+                        children: [
+                          ListTile(
+                            title: Text('Name'),
+                            trailing: Icon(Icons.chevron_right, size: 20),
+                          ),
+                          SizedBox(height: 10),
+
+                          ListTile(
+                            title: Text('Email'),
+                            trailing: Icon(Icons.chevron_right, size: 20),
+                          ),
+                          SizedBox(height: 10),
+
+                          ListTile(
+                            title: Text('phone'),
+                            trailing: Icon(Icons.chevron_right, size: 20),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
 
-                SizedBox(height: 20),
-
-                Text(
-                  'Profile',
-                  style: TextStyle(
-                    fontSize: 35,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                ),
-
-                SizedBox(height: 10),
-                Container(
-                  margin: EdgeInsets.all(20),
-                  padding: EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    children: [
-                      ListTile(
-                        title: Text('Name'),
-                        trailing: Icon(Icons.chevron_right, size: 20),
-                      ),
-                      SizedBox(height: 10),
-
-                      ListTile(
-                        title: Text('Email'),
-                        trailing: Icon(Icons.chevron_right, size: 20),
-                      ),
-                      SizedBox(height: 10),
-
-                      ListTile(
-                        title: Text('phone'),
-                        trailing: Icon(Icons.chevron_right, size: 20),
-                      ),
-                    ],
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 20.0),
+                  child: MyButton(
+                    text: 'logout',
+                    onTap: logout,
+                    borderRadius: BorderRadius.circular(15),
                   ),
                 ),
               ],
             ),
-
-            Padding(
-              padding: const EdgeInsets.only(bottom: 20.0),
-              child: MyButton(
-                text: 'logout',
-                onTap: logout,
-                borderRadius: BorderRadius.circular(15),
-              ),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

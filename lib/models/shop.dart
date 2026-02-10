@@ -266,4 +266,31 @@ class Shop extends ChangeNotifier {
     }
     return _shop.where((product) => product.categoryId == categoryId).toList();
   }
+
+  //Get count of selected item
+  bool areAllItemsSelected() {
+    if (_cart.isEmpty) return false;
+    return _cart.every((item) => item.isSelected);
+  }
+
+  //Get count of selected items
+  int getSelectedItemsCount() {
+    return _cart.where((item) => item.isSelected).length;
+  }
+
+  // Toggle select all items
+  void toggleSelectAll() {
+    bool allSelected = areAllItemsSelected();
+
+    for (int i = 0; i < _cart.length; i++) {
+      final item = _cart[i];
+      _cart[i] = CartItem(
+        cartItemId: item.cartItemId,
+        isSelected: !allSelected,
+        productId: item.productId,
+        quantity: item.quantity,
+      );
+    }
+    notifyListeners();
+  }
 }
