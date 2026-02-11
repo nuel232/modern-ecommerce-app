@@ -93,7 +93,7 @@ class _ShopTileState extends State<ShopTile> {
                     widget.product.description,
                     style: GoogleFonts.poppins(
                       color: Theme.of(context).colorScheme.onPrimary,
-                      fontSize: 14,
+                      fontSize: 12,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
