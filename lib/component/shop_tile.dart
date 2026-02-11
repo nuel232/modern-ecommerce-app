@@ -91,9 +91,9 @@ class _ShopTileState extends State<ShopTile> {
                   padding: const EdgeInsets.symmetric(horizontal: 10.0),
                   child: Text(
                     widget.product.description,
-                    style: GoogleFonts.dmSans(
+                    style: GoogleFonts.poppins(
                       color: Theme.of(context).colorScheme.onPrimary,
-                      fontSize: 12,
+                      fontSize: 14,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,

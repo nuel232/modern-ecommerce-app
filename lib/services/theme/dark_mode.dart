@@ -12,7 +12,7 @@ ThemeData darkMode = ThemeData(
     inverseSurface: Color.fromARGB(255, 217, 221, 226),
   ),
   textTheme: ThemeData.dark().textTheme.apply(
-    bodyColor: const Color.fromARGB(255, 206, 211, 216),
-    displayColor: const Color.fromARGB(255, 206, 211, 216),
+    bodyColor: Colors.white,
+    displayColor: Colors.white,
   ),
 );
