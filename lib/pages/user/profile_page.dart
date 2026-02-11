@@ -76,11 +76,8 @@ class ProfilePage extends StatelessWidget {
                     SizedBox(height: 20),
 
                     Text(
-                      user.name.isNotEmpty ? user.name : 'profile',
-                      style: TextStyle(
-                        fontSize: 35,
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
+                      user.name.isNotEmpty ? user.name : 'Guest User',
+                      style: TextStyle(fontSize: 35),
                     ),
 
                     SizedBox(height: 10),

@@ -33,7 +33,7 @@ class UserModel {
   factory UserModel.fromMap(Map<String, dynamic> map) {
     return UserModel(
       uid: map['uid'] ?? '',
-      name: map['name'],
+      name: map['name'] ?? '',
       email: map['email'] ?? '',
       role: map['role'] ?? 'user', // Default to 'user' if no role
       addresses:

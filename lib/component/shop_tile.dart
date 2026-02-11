@@ -143,8 +143,10 @@ class _ShopTileState extends State<ShopTile> {
                 //button to add to cart
                 GestureDetector(
                   onTap: () {
-                    context.read<Shop>().addToCart(widget.product);
-
+                    Provider.of<Shop>(
+                      context,
+                      listen: false,
+                    ).addToCart(widget.product);
                     // Trigger animation
                     setState(() {
                       isAdded = true;

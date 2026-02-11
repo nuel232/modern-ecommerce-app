@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:morden_ecommerce_app/models/address_model.dart';
 import 'package:morden_ecommerce_app/models/user.dart';
 
 class CheckoutPage extends StatelessWidget {
@@ -30,38 +31,56 @@ class CheckoutPage extends StatelessWidget {
           );
 
           final addresses = user.addresses;
-          // pick default address if any, otherwise the first one
-          final address = addresses.firstWhere(
-            (a) => a.isDefault,
-            orElse: () => addresses.first,
-          );
+          // ✅ Declare address as nullable
+          AddressModel? address;
 
+          // ✅ Only try to get address if list is not empty
+          if (addresses.isNotEmpty) {
+            address = addresses.firstWhere(
+              (a) => a.isDefault,
+              orElse: () => addresses.first,
+            );
+          }
           return Column(
             children: [
               //users address
               Container(
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15),
-                  color: Theme.of(context).colorScheme.secondary,
-                ),
-                child: addresses.isEmpty
-                    ? Text(
-                        'please input your address',
-                        style: GoogleFonts.dmSans(
-                          color: Colors.red,
-                          fontSize: 13,
+                  border: addresses.isEmpty
+                      ? Border.all(color: Colors.red)
+                      : Border.all(
+                          color: Theme.of(context).colorScheme.primary,
                         ),
-                      )
-                    : Column(
-                        children: [
-                          Text("Contact: ${address.email}"),
-                          Text('name: ${address.fullName}'),
-                          Text('phone: ${address.phoneNumber}'),
-                          Text(
-                            'Ship to:  ${address.streetAddress}, ${address.city}, ${address.state} ',
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+
+                child: ListTile(
+                  title: Text('Shipping Address'),
+
+                  subtitle: addresses.isEmpty
+                      ? Text(
+                          'please input your address',
+                          style: GoogleFonts.dmSans(
+                            color: Colors.red,
+                            fontSize: 15,
                           ),
-                        ],
-                      ),
+                        )
+                      : Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Contact: ${address!.email}'),
+                            Text('name: ${address!.fullName}'),
+                            Text('phone: ${address!.phoneNumber}'),
+                            Text(
+                              'Ship to:  ${address!.streetAddress}, ${address!.city}, ${address!.state} ',
+                            ),
+                          ],
+                        ),
+                ),
               ),
 
               //delivery method

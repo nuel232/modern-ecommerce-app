@@ -12,7 +12,7 @@ ThemeData lightMode = ThemeData(
   ),
 
   textTheme: ThemeData.light().textTheme.apply(
-    bodyColor: const Color.fromARGB(255, 47, 52, 60),
-    displayColor: const Color.fromARGB(255, 47, 52, 60),
+    bodyColor: Colors.black,
+    displayColor: Colors.black,
   ),
 );
