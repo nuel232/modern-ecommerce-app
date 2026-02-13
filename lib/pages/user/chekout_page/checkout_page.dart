@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:morden_ecommerce_app/models/address_model.dart';
 import 'package:morden_ecommerce_app/models/user.dart';
+import 'package:morden_ecommerce_app/pages/user/chekout_page/address_form.dart';
+import 'package:morden_ecommerce_app/pages/user/chekout_page/address_list.dart';
+import 'package:morden_ecommerce_app/pages/user/chekout_page/address_page.dart';
 
 class CheckoutPage extends StatelessWidget {
   const CheckoutPage({super.key});
@@ -80,7 +83,22 @@ class CheckoutPage extends StatelessWidget {
                             ),
                           ],
                         ),
-                  trailing: Icon(Icons.arrow_forward_ios_rounded, size: 15),
+                  trailing: GestureDetector(
+                    onTap: () {
+                      addresses.isEmpty
+                          ? Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AddressForm(),
+                              ),
+                            )
+                          : showModalBottomSheet(
+                              context: context,
+                              builder: (context) => AddressList(),
+                            );
+                    },
+                    child: Icon(Icons.arrow_forward_ios_rounded, size: 15),
+                  ),
                 ),
               ),
 
