@@ -7,6 +7,7 @@ import 'package:morden_ecommerce_app/models/user.dart';
 import 'package:morden_ecommerce_app/pages/user/chekout_page/address_form.dart';
 import 'package:morden_ecommerce_app/pages/user/chekout_page/address_list.dart';
 import 'package:morden_ecommerce_app/pages/user/chekout_page/address_page.dart';
+import 'package:morden_ecommerce_app/pages/user/chekout_page/widgets/address_widget.dart';
 
 class CheckoutPage extends StatelessWidget {
   const CheckoutPage({super.key});
@@ -37,70 +38,10 @@ class CheckoutPage extends StatelessWidget {
           // ✅ Declare address as nullable
           AddressModel? address;
 
-          // ✅ Only try to get address if list is not empty
-          if (addresses.isNotEmpty) {
-            address = addresses.firstWhere(
-              (a) => a.isDefault,
-              orElse: () => addresses.first,
-            );
-          }
           return Column(
             children: [
               //users address
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  border: addresses.isEmpty
-                      ? Border.all(color: Colors.red)
-                      : Border.all(
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-
-                child: ListTile(
-                  title: Text('Shipping Address'),
-
-                  subtitle: addresses.isEmpty
-                      ? Text(
-                          'please input your address',
-                          style: GoogleFonts.dmSans(
-                            color: Colors.red,
-                            fontSize: 15,
-                          ),
-                        )
-                      : Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Contact: ${address!.email}'),
-                            Text('name: ${address!.fullName}'),
-                            Text('phone: ${address!.phoneNumber}'),
-                            Text(
-                              'Ship to:  ${address!.streetAddress}, ${address!.city}, ${address!.state} ',
-                            ),
-                          ],
-                        ),
-                  trailing: GestureDetector(
-                    onTap: () {
-                      addresses.isEmpty
-                          ? Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => AddressForm(),
-                              ),
-                            )
-                          : showModalBottomSheet(
-                              context: context,
-                              builder: (context) => AddressList(),
-                            );
-                    },
-                    child: Icon(Icons.arrow_forward_ios_rounded, size: 15),
-                  ),
-                ),
-              ),
+              AddressWidget(),
 
               //delivery method
               Container(),
