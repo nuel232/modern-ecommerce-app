@@ -22,10 +22,6 @@ class AddressWidget extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
 
-        if (!snapshot.hasData || !snapshot.data!.exists) {
-          return const Center(child: Text('user data not found'));
-        }
-
         final user = UserModel.fromMap(
           snapshot.data!.data() as Map<String, dynamic>,
         );
@@ -71,10 +67,10 @@ class AddressWidget extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text('Contact: ${address!.email}'),
-                          Text('name: ${address!.fullName}'),
-                          Text('phone: ${address!.phoneNumber}'),
+                          Text('name: ${address.fullName}'),
+                          Text('phone: ${address.phoneNumber}'),
                           Text(
-                            'Ship to:  ${address!.streetAddress}, ${address!.city}, ${address!.state} ',
+                            'Ship to:  ${address.streetAddress}, ${address.city}, ${address.state} ',
                           ),
                         ],
                       ),
@@ -99,33 +95,9 @@ class AddressWidget extends StatelessWidget {
                             });
                       }
                     } else {
-                      // // EDIT — pass existing address
-                      // final updatedAddress = await Navigator.push<AddressModel>(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) =>
-                      //         AddressForm(existingAddress: address),
-                      //   ),
-                      // );
-
-                      // if (updatedAddress != null) {
-                      //   //replace the old address in firestore
-                      //   final updatedList = addresses
-                      //       .map(
-                      //         (a) => a.addressId == updatedAddress.addressId
-                      //             ? updatedAddress.toMap()
-                      //             : a.toMap(),
-                      //       )
-                      //       .toList();
-
-                      //   await FirebaseFirestore.instance
-                      //       .collection('users')
-                      //       .doc(FirebaseAuth.instance.currentUser!.uid)
-                      //       .update({'addresses': updatedList});
-                      // }
                       showModalBottomSheet(
                         context: context,
-                        builder: (context) => AddressForm(),
+                        builder: (context) => AddressList(),
                       );
                     }
                   },

@@ -15,28 +15,43 @@ class CheckoutPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Column(
-        children: [
-          //users address
-          AddressWidget(),
+      body: StreamBuilder(
+        stream: FirebaseFirestore.instance
+            .collection('users')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-          //order summary
+          if (!snapshot.hasData || !snapshot.data!.exists) {
+            return const Center(child: Text('user data not found'));
+          }
+          return Column(
+            children: [
+              //users address
+              AddressWidget(),
 
-          //delivery method
-          Container(),
+              //order summary
 
-          //Promo code
+              //delivery method
+              Container(),
 
-          //payment method
+              //Promo code
 
-          //special instruction
+              //payment method
 
-          //price breakdown
+              //special instruction
 
-          //Terms and conditions
+              //price breakdown
 
-          //place order button
-        ],
+              //Terms and conditions
+
+              //place order button
+            ],
+          );
+        },
       ),
     );
   }
