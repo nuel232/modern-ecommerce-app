@@ -79,18 +79,55 @@ class AddressWidget extends StatelessWidget {
                         ],
                       ),
                 trailing: GestureDetector(
-                  onTap: () {
-                    addresses.isEmpty
-                        ? Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => AddressForm(),
-                            ),
-                          )
-                        : showModalBottomSheet(
-                            context: context,
-                            builder: (context) => AddressList(),
-                          );
+                  onTap: () async {
+                    if (addresses.isEmpty) {
+                      // CREATE — no existing address
+                      final newAddress = await Navigator.push<AddressModel>(
+                        context,
+                        MaterialPageRoute(builder: (context) => AddressForm()),
+                      );
+
+                      if (newAddress != null) {
+                        //save to firestore
+                        await FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(FirebaseAuth.instance.currentUser!.uid)
+                            .update({
+                              'addresses': FieldValue.arrayUnion([
+                                newAddress.toMap(),
+                              ]),
+                            });
+                      }
+                    } else {
+                      // // EDIT — pass existing address
+                      // final updatedAddress = await Navigator.push<AddressModel>(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) =>
+                      //         AddressForm(existingAddress: address),
+                      //   ),
+                      // );
+
+                      // if (updatedAddress != null) {
+                      //   //replace the old address in firestore
+                      //   final updatedList = addresses
+                      //       .map(
+                      //         (a) => a.addressId == updatedAddress.addressId
+                      //             ? updatedAddress.toMap()
+                      //             : a.toMap(),
+                      //       )
+                      //       .toList();
+
+                      //   await FirebaseFirestore.instance
+                      //       .collection('users')
+                      //       .doc(FirebaseAuth.instance.currentUser!.uid)
+                      //       .update({'addresses': updatedList});
+                      // }
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (context) => AddressForm(),
+                      );
+                    }
                   },
                   child: Icon(Icons.arrow_forward_ios_rounded, size: 15),
                 ),

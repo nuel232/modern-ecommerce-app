@@ -6,7 +6,6 @@ import 'package:morden_ecommerce_app/models/address_model.dart';
 import 'package:morden_ecommerce_app/models/user.dart';
 import 'package:morden_ecommerce_app/pages/user/chekout_page/address_form.dart';
 import 'package:morden_ecommerce_app/pages/user/chekout_page/address_list.dart';
-import 'package:morden_ecommerce_app/pages/user/chekout_page/address_page.dart';
 import 'package:morden_ecommerce_app/pages/user/chekout_page/widgets/address_widget.dart';
 
 class CheckoutPage extends StatelessWidget {
@@ -16,52 +15,28 @@ class CheckoutPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: StreamBuilder(
-        stream: FirebaseFirestore.instance
-            .collection('users')
-            .doc(FirebaseAuth.instance.currentUser!.uid)
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      body: Column(
+        children: [
+          //users address
+          AddressWidget(),
 
-          if (!snapshot.hasData || !snapshot.data!.exists) {
-            return const Center(child: Text('user data not found'));
-          }
+          //order summary
 
-          final user = UserModel.fromMap(
-            snapshot.data!.data() as Map<String, dynamic>,
-          );
+          //delivery method
+          Container(),
 
-          final addresses = user.addresses;
-          // ✅ Declare address as nullable
-          AddressModel? address;
+          //Promo code
 
-          return Column(
-            children: [
-              //users address
-              AddressWidget(),
+          //payment method
 
-              //delivery method
-              Container(),
+          //special instruction
 
-              //order summary
+          //price breakdown
 
-              //Promo code
+          //Terms and conditions
 
-              //payment method
-
-              //special instruction
-
-              //price breakdown
-
-              //Terms and conditions
-
-              //place order button
-            ],
-          );
-        },
+          //place order button
+        ],
       ),
     );
   }

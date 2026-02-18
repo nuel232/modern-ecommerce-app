@@ -5,7 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:morden_ecommerce_app/component/cart_items_tile.dart';
 import 'package:morden_ecommerce_app/component/my_button.dart';
 import 'package:morden_ecommerce_app/models/cart_item.dart';
-import 'package:morden_ecommerce_app/pages/user/checkout_page.dart';
+import 'package:morden_ecommerce_app/pages/user/chekout_page/checkout_page.dart';
 import 'package:morden_ecommerce_app/models/shop.dart';
 import 'package:provider/provider.dart';
 
@@ -83,7 +83,7 @@ class CartPage extends StatelessWidget {
                     size: 100,
                     color: Theme.of(
                       context,
-                    ).colorScheme.onSurface.withOpacity(0.3),
+                    ).colorScheme.onSurface.withOpacity(0.2),
                   ),
 
                   SizedBox(height: 20),
