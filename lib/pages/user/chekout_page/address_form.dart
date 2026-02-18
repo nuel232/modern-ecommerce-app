@@ -7,8 +7,7 @@ import 'package:uuid/uuid.dart';
 
 class AddressForm extends StatefulWidget {
   final AddressModel? existingAddress;
-  final Function(AddressModel)? onSave;
-  const AddressForm({super.key, this.existingAddress, this.onSave});
+  const AddressForm({super.key, this.existingAddress});
 
   @override
   State<AddressForm> createState() => _AddressFormState();
