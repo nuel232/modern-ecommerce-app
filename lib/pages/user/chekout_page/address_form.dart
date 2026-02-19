@@ -126,7 +126,6 @@ class _AddressFormState extends State<AddressForm> {
                         label: "Full Name",
                         controller: fullNameController,
                         isRequired: true,
-                        hintText: 'e.g John Doe',
                       ),
 
                       /// STATE

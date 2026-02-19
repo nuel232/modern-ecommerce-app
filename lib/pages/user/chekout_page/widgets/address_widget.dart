@@ -100,7 +100,7 @@ class AddressWidget extends StatelessWidget {
                         builder: (context) => AddressList(),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.vertical(
-                            top: Radius.circular(25),
+                            top: Radius.circular(35),
                           ),
                         ),
                       );

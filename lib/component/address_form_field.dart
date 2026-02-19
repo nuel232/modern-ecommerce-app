@@ -27,7 +27,7 @@ class AddressFormField extends StatelessWidget {
         children: [
           /// Label
           Padding(
-            padding: const EdgeInsets.only(top: 5.0),
+            padding: const EdgeInsets.only(top: 10.0),
             child: Text.rich(
               TextSpan(
                 children: [
@@ -53,9 +53,18 @@ class AddressFormField extends StatelessWidget {
               errorText: errorText,
               prefixIcon: prefix,
 
+              isDense: true,
+              contentPadding: EdgeInsets.symmetric(vertical: 8),
               enabledBorder: UnderlineInputBorder(
                 borderSide: BorderSide(
                   color: Theme.of(context).colorScheme.secondary,
+                  width: 0.4,
+                ),
+              ),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(
+                  color: Theme.of(context).colorScheme.secondary,
+                  width: 0.3,
                 ),
               ),
             ),
@@ -63,6 +72,5 @@ class AddressFormField extends StatelessWidget {
         ],
       ),
     );
-    ;
   }
 }
