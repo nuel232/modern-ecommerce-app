@@ -98,6 +98,11 @@ class AddressWidget extends StatelessWidget {
                       showModalBottomSheet(
                         context: context,
                         builder: (context) => AddressList(),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(25),
+                          ),
+                        ),
                       );
                     }
                   },

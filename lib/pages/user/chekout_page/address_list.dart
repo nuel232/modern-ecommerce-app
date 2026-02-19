@@ -26,6 +26,7 @@ class AddressList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Text('shipping address'),
         centerTitle: true,
         actions: [
@@ -33,9 +34,16 @@ class AddressList extends StatelessWidget {
             onTap: () {
               Navigator.pop(context);
             },
-            child: Icon(Icons.close),
+            child: Padding(
+              padding: const EdgeInsets.only(right: 10.0),
+              child: Icon(Icons.close),
+            ),
           ),
         ],
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(1),
+          child: Container(height: 0.5, color: Colors.grey.shade300),
+        ),
       ),
 
       body: StreamBuilder(
@@ -69,6 +77,7 @@ class AddressList extends StatelessWidget {
 
                   batch.update(userRef, {'addresses': updatedAddress});
                   await batch.commit();
+                  Navigator.pop(context);
                 },
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
@@ -77,11 +86,11 @@ class AddressList extends StatelessWidget {
                     borderRadius: BorderRadius.circular(15),
                     border: Border.all(
                       color: address.isDefault
-                          ? Colors.green
+                          ? Colors.green.shade600
                           : Theme.of(context).colorScheme.primary,
                     ),
                     color: address.isDefault
-                        ? Colors.green.shade200
+                        ? Colors.green.shade300.withOpacity(0.2)
                         : Theme.of(context).colorScheme.primary,
                   ),
 
@@ -139,7 +148,7 @@ class AddressList extends StatelessWidget {
                         }
                       },
 
-                      child: Icon(Icons.edit_note_rounded, size: 15),
+                      child: Icon(Icons.edit_note_rounded, size: 25),
                     ),
                   ),
                 ),
