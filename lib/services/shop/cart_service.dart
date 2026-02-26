@@ -1,40 +1,45 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:morden_ecommerce_app/models/cart_item.dart';
 
 class CartService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  CollectionReference _cartRef(String uid) =>
+  CollectionReference<Map<String, dynamic>> _cartRef(String uid) =>
       _firestore.collection('users').doc(uid).collection('cart');
 
-  //stream all cart items for a user
+  // Stream all cart items for a user
   Stream<List<CartItem>> getCartStream(String uid) {
     return _cartRef(uid).snapshots().map(
-      (snapshot) => snapshot.docs
-          .map((doc) => CartItem.fromMap(doc.data() as Map<String, dynamic>))
-          .toList(),
+      (snapshot) =>
+          snapshot.docs.map((doc) => CartItem.fromMap(doc.data())).toList(),
     );
   }
 
   // Add or increment quantity if product already in cart
   Future<void> addToCart(String uid, String productId) async {
-    final query = await _cartRef(
-      uid,
-    ).where('productId', isEqualTo: productId).limit(1).get();
+    try {
+      final query = await _cartRef(
+        uid,
+      ).where('productId', isEqualTo: productId).limit(1).get();
 
-    if (query.docs.isNotEmpty) {
-      final doc = query.docs.first;
-      final current = CartItem.fromMap(doc.data() as Map<String, dynamic>);
-      await doc.reference.update({'quantity': current.quantity + 1});
-    } else {
-      final newItem = CartItem(
-        cartItemId: _cartRef(uid).doc().id,
-        productId: productId,
-        quantity: 1,
-        isSelected: true,
-      );
-      await _cartRef(uid).doc(newItem.cartItemId).set(newItem.toMap());
+      if (query.docs.isNotEmpty) {
+        final doc = query.docs.first;
+        final current = CartItem.fromMap(doc.data());
+        await doc.reference.update({'quantity': current.quantity + 1});
+      } else {
+        // Generate a new doc reference first, then use its id
+        final docRef = _cartRef(uid).doc();
+        final newItem = CartItem(
+          cartItemId: docRef.id,
+          productId: productId,
+          quantity: 1,
+          isSelected: true,
+        );
+        await docRef.set(newItem.toMap());
+      }
+    } catch (e) {
+      print('CartService addToCart error: $e');
+      rethrow;
     }
   }
 

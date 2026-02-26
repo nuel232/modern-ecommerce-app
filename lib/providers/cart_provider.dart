@@ -12,12 +12,15 @@ class CartProvider extends ChangeNotifier {
   StreamSubscription? _subscription;
 
   List<CartItem> get cart => _cart;
+  bool get isReady => _uid != null;
 
   void listenToCart(String uid) {
-    // Cancel any existing subscription before starting a new one
-    _subscription?.cancel();
+    // Skip if already listening to this uid
+    if (_uid == uid && _subscription != null) return;
 
+    _subscription?.cancel();
     _uid = uid;
+
     _subscription = _cartService.getCartStream(uid).listen((items) {
       _cart = items;
       notifyListeners();
@@ -25,8 +28,17 @@ class CartProvider extends ChangeNotifier {
   }
 
   Future<void> addToCart(String productId) async {
-    if (_uid == null) return;
-    await _cartService.addToCart(_uid!, productId);
+    if (_uid == null) {
+      print(
+        'CartProvider: addToCart called but _uid is null — user not logged in or listenToCart not called yet',
+      );
+      return;
+    }
+    try {
+      await _cartService.addToCart(_uid!, productId);
+    } catch (e) {
+      print('CartProvider addToCart error: $e');
+    }
   }
 
   Future<void> removeFromCart(CartItem item) async {
