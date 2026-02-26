@@ -2,6 +2,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:morden_ecommerce_app/firebase_options.dart';
 import 'package:morden_ecommerce_app/models/shop.dart';
+import 'package:morden_ecommerce_app/providers/cart_provider.dart';
+import 'package:morden_ecommerce_app/providers/product_provider.dart';
 import 'package:morden_ecommerce_app/services/auth/auth_gate.dart';
 import 'package:morden_ecommerce_app/services/theme/theme_provider.dart';
 import 'package:provider/provider.dart';
@@ -16,6 +18,8 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
         ChangeNotifierProvider(create: (context) => Shop()),
+        ChangeNotifierProvider(create: (_) => ProductProvider()),
+        ChangeNotifierProvider(create: (_) => CartProvider()),
       ],
       child: const MyApp(),
     ),

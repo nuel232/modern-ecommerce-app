@@ -24,7 +24,7 @@ class ProductService {
 
   //Read
   Stream<List<ProductModel>> getProductsStream() {
-    return products
+    return products 
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map(

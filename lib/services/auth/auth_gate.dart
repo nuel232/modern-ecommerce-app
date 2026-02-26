@@ -2,8 +2,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:morden_ecommerce_app/pages/admin/admin_page.dart';
 import 'package:morden_ecommerce_app/pages/user/home_page.dart';
+import 'package:morden_ecommerce_app/providers/cart_provider.dart';
+import 'package:morden_ecommerce_app/providers/product_provider.dart';
 import 'package:morden_ecommerce_app/services/auth/auth_service.dart';
 import 'package:morden_ecommerce_app/services/auth/login_or_register.dart';
+import 'package:provider/provider.dart';
 
 class AuthGate extends StatefulWidget {
   const AuthGate({super.key});
@@ -34,6 +37,11 @@ class _AuthGateState extends State<AuthGate> {
     }
   }
 
+  void _startProviders(String uid) {
+    context.read<ProductProvider>().listenToProducts();
+    context.read<CartProvider>().listenToCart(uid);
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
@@ -41,7 +49,7 @@ class _AuthGateState extends State<AuthGate> {
       builder: (context, snapshot) {
         // User is logged in
         if (snapshot.hasData) {
-          User? user = snapshot.data;
+          User? user = snapshot.data!;
 
           // Use cached role if available (better for hot reload)
           if (_cachedRole != null) {
@@ -52,7 +60,7 @@ class _AuthGateState extends State<AuthGate> {
 
           // Otherwise fetch role
           return FutureBuilder<String?>(
-            future: AuthService().getUserRole(user!.uid),
+            future: AuthService().getUserRole(user.uid),
             builder: (context, roleSnapshot) {
               if (roleSnapshot.connectionState == ConnectionState.waiting) {
                 return Scaffold(
@@ -67,7 +75,9 @@ class _AuthGateState extends State<AuthGate> {
 
               if (roleSnapshot.hasData) {
                 // Cache the role for hot reload
+
                 _cachedRole = roleSnapshot.data;
+                _startProviders(user.uid);
                 return _cachedRole == 'admin'
                     ? const AdminPage()
                     : const HomePage();
