@@ -8,43 +8,40 @@ class ProductService {
     'products',
   );
 
-  //create a new product
+  // Create a new product
   Future<void> createProduct(ProductModel product) async {
     await products.doc(product.productId).set({
-      ...product.toMap(),
-      'createdAt': FieldValue.serverTimestamp(),
+      'productId': product.productId,
+      'name': product.name,
+      'description': product.description,
+      'price': product.price,
+      'stock': product.stock,
+      'imagePath': product.imagePath,
+      'categoryId': product.categoryId,
+      'createdAt': DateTime.now().millisecondsSinceEpoch,
     });
   }
-  //   Future<void> createProduct(Map<String, dynamic> product) async {
-  //   await products.doc(product['productId']).set({
-  //     ...product,
-  //     'createdAt': FieldValue.serverTimestamp(),
-  //   });
-  // }
 
-  //Read
+  // Stream all products — no orderBy to avoid index requirement
   Stream<List<ProductModel>> getProductsStream() {
-    return products 
-        .orderBy('createdAt', descending: true)
-        .snapshots()
-        .map(
-          (snapshot) => snapshot.docs
-              .map(
-                (doc) => ProductModel.fromMap({
-                  'productId': doc.id,
-                  ...doc.data() as Map<String, dynamic>,
-                }),
-              )
-              .toList(),
-        );
+    return products.snapshots().map(
+      (snapshot) => snapshot.docs
+          .map(
+            (doc) => ProductModel.fromMap({
+              'productId': doc.id,
+              ...doc.data() as Map<String, dynamic>,
+            }),
+          )
+          .toList(),
+    );
   }
 
-  //update
+  // Update a product
   Future<void> updateProduct(ProductModel product) async {
     await products.doc(product.productId).update(product.toMap());
   }
 
-  //delete
+  // Delete a product
   Future<void> deleteProduct(String productId) async {
     await products.doc(productId).delete();
   }

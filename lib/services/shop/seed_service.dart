@@ -87,7 +87,6 @@ class SeedService {
       stock: 6,
       imagePath: 'lib/Images/Craft-Arlo-Lace.jpeg',
     ),
-
     // ===== ACCESSORIES (Cat_002) =====
     ProductModel(
       productId: '10',
@@ -107,7 +106,6 @@ class SeedService {
       stock: 12,
       imagePath: 'lib/Images/Glasses.jpg',
     ),
-
     // ===== SHIRTS (Cat_003) =====
     ProductModel(
       productId: '12',
@@ -138,31 +136,40 @@ class SeedService {
     ),
   ];
 
-  /// Uploads dummy products only if the products collection is empty.
-  /// Safe to call every time — won't duplicate.
   Future<void> seedProductsIfEmpty() async {
-    final snapshot = await _firestore.collection('products').limit(1).get();
+    try {
+      final snapshot = await _firestore.collection('products').limit(1).get();
 
-    if (snapshot.docs.isNotEmpty) {
-      print('SeedService: products already exist, skipping seed.');
-      return;
+      if (snapshot.docs.isNotEmpty) {
+        print('SeedService: products already exist, skipping seed.');
+        return;
+      }
+
+      print('SeedService: seeding ${_dummyProducts.length} products...');
+
+      // Use a numeric timestamp offset per product so ordering is stable
+      // without needing a Firestore composite index on createdAt
+      final now = DateTime.now().millisecondsSinceEpoch;
+
+      for (int i = 0; i < _dummyProducts.length; i++) {
+        final product = _dummyProducts[i];
+        // Build the map manually — don't spread toMap() since it includes
+        // createdAt as a String which conflicts with the int we store here
+        await _firestore.collection('products').doc(product.productId).set({
+          'productId': product.productId,
+          'name': product.name,
+          'description': product.description,
+          'price': product.price,
+          'stock': product.stock,
+          'imagePath': product.imagePath,
+          'categoryId': product.categoryId,
+          'createdAt': now + i, // int, increments to preserve order
+        });
+      }
+
+      print('SeedService: seeding complete.');
+    } catch (e) {
+      print('SeedService error: $e');
     }
-
-    print(
-      'SeedService: no products found, seeding ${_dummyProducts.length} products...',
-    );
-
-    final batch = _firestore.batch();
-
-    for (final product in _dummyProducts) {
-      final ref = _firestore.collection('products').doc(product.productId);
-      batch.set(ref, {
-        ...product.toMap(),
-        'createdAt': FieldValue.serverTimestamp(),
-      });
-    }
-
-    await batch.commit();
-    print('SeedService: seeding complete.');
   }
 }

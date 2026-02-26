@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:morden_ecommerce_app/models/cart_item.dart';
 import 'package:morden_ecommerce_app/models/product.dart';
@@ -8,19 +9,20 @@ class CartProvider extends ChangeNotifier {
 
   List<CartItem> _cart = [];
   String? _uid;
+  StreamSubscription? _subscription;
 
   List<CartItem> get cart => _cart;
 
-  // Start listening to Firestore cart stream for this user
   void listenToCart(String uid) {
+    // Cancel any existing subscription before starting a new one
+    _subscription?.cancel();
+
     _uid = uid;
-    _cartService.getCartStream(uid).listen((items) {
+    _subscription = _cartService.getCartStream(uid).listen((items) {
       _cart = items;
       notifyListeners();
-    });
+    }, onError: (e) => print('CartProvider stream error: $e'));
   }
-
-  // --- Cart actions (all delegate to CartService) ---
 
   Future<void> addToCart(String productId) async {
     if (_uid == null) return;
@@ -44,16 +46,13 @@ class CartProvider extends ChangeNotifier {
 
   Future<void> toggleSelectAll() async {
     if (_uid == null) return;
-    final allSelected = areAllSelected();
-    await _cartService.toggleSelectAll(_uid!, _cart, !allSelected);
+    await _cartService.toggleSelectAll(_uid!, _cart, !areAllSelected());
   }
 
   Future<void> clearCart() async {
     if (_uid == null) return;
     await _cartService.clearCart(_uid!);
   }
-
-  // --- Helpers ---
 
   bool areAllSelected() {
     if (_cart.isEmpty) return false;
@@ -82,5 +81,20 @@ class CartProvider extends ChangeNotifier {
       total += product.price * item.quantity;
     }
     return total;
+  }
+
+  // Called on logout — clears local cart state and stops listening
+  void reset() {
+    _subscription?.cancel();
+    _subscription = null;
+    _uid = null;
+    _cart = [];
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
   }
 }
