@@ -18,36 +18,39 @@ class AuthGate extends StatefulWidget {
 
 class _AuthGateState extends State<AuthGate> {
   String? _cachedRole;
-  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadInitialRole();
-    SeedService().seedProductsIfEmpty();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ProductProvider>().listenToProducts();
+      SeedService().seedProductsIfEmpty();
+
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        context.read<CartProvider>().listenToCart(user.uid);
+        _fetchRole(user.uid);
+      }
+    });
   }
 
-  Future<void> _loadInitialRole() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      _cachedRole = await AuthService().getUserRole(user.uid);
-      _startProviders(user.uid);
-    }
-    if (mounted) setState(() => _isLoading = false);
-  }
-
-  void _startProviders(String uid) {
-    context.read<ProductProvider>().listenToProducts();
-    context.read<CartProvider>().listenToCart(uid);
+  Future<void> _fetchRole(String uid) async {
+    final role = await AuthService().getUserRole(uid);
+    if (mounted) setState(() => _cachedRole = role);
   }
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
+    return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           final user = snapshot.data!;
+
+          // Schedule cart start after build — never call notifyListeners during build
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            context.read<CartProvider>().listenToCart(user.uid);
+          });
 
           if (_cachedRole != null) {
             return _cachedRole == 'admin'
@@ -68,20 +71,18 @@ class _AuthGateState extends State<AuthGate> {
                   ),
                 );
               }
-
-              if (roleSnapshot.hasData) {
-                _cachedRole = roleSnapshot.data;
-                _startProviders(user.uid);
-                return _cachedRole == 'admin'
-                    ? const AdminPage()
-                    : const HomePage();
-              }
-
-              return const HomePage();
+              _cachedRole = roleSnapshot.data;
+              return _cachedRole == 'admin'
+                  ? const AdminPage()
+                  : const HomePage();
             },
           );
         }
 
+        // Logged out — schedule reset after build to avoid setState-during-build
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          context.read<CartProvider>().reset();
+        });
         return const LoginOrRegister();
       },
     );

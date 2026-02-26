@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:morden_ecommerce_app/models/product.dart';
-import 'package:morden_ecommerce_app/models/shop.dart';
+import 'package:morden_ecommerce_app/providers/cart_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -14,35 +14,6 @@ class ShopTile extends StatefulWidget {
 
 class _ShopTileState extends State<ShopTile> {
   bool isAdded = false;
-
-  void addToCart(BuildContext context) {
-    //show dialog box
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        content: Text('Add the to cart ?'),
-        actions: [
-          //cancel button
-          MaterialButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Cancel'),
-          ),
-
-          //yes
-          MaterialButton(
-            onPressed: () {
-              //pop dialog box
-              Navigator.pop(context);
-
-              //add to cart
-              context.read<Shop>().addToCart(widget.product);
-            },
-            child: Text('Yes'),
-          ),
-        ],
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +63,7 @@ class _ShopTileState extends State<ShopTile> {
                   child: Text(
                     widget.product.description,
                     style: GoogleFonts.poppins(
-                      color: Theme.of(context).colorScheme.onPrimary,
+                      color: colorScheme.onPrimary,
                       fontSize: 12,
                     ),
                     maxLines: 2,
@@ -103,14 +74,14 @@ class _ShopTileState extends State<ShopTile> {
             ),
           ),
 
-          //price
+          // Price row
           Padding(
             padding: const EdgeInsets.only(left: 10.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                //product name
+                // Product name + price
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.only(right: 8.0),
@@ -122,16 +93,16 @@ class _ShopTileState extends State<ShopTile> {
                           style: GoogleFonts.dmSans(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.onPrimary,
+                            color: colorScheme.onPrimary,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         SizedBox(height: 4),
                         Text(
-                          '₦${widget.product.price.toStringAsFixed(2)}',
+                          '₦${widget.product.price.toStringAsFixed(0)}',
                           style: GoogleFonts.dmSans(
-                            color: Theme.of(context).colorScheme.onPrimary,
+                            color: colorScheme.onPrimary,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -140,28 +111,21 @@ class _ShopTileState extends State<ShopTile> {
                   ),
                 ),
 
-                //button to add to cart
+                // Add to cart button
                 GestureDetector(
                   onTap: () {
-                    Provider.of<Shop>(
-                      context,
-                      listen: false,
-                    ).addToCart(widget.product);
-                    // Trigger animation
-                    setState(() {
-                      isAdded = true;
-                    });
+                    // Add to Firestore via CartProvider
+                    context.read<CartProvider>().addToCart(
+                      widget.product.productId,
+                    );
 
-                    // Reset animation after delay
+                    // Trigger scale animation
+                    setState(() => isAdded = true);
                     Future.delayed(const Duration(milliseconds: 400), () {
-                      if (mounted) {
-                        setState(() {
-                          isAdded = false;
-                        });
-                      }
+                      if (mounted) setState(() => isAdded = false);
                     });
 
-                    //Bottom Sheet
+                    // Show bottom sheet confirmation
                     showModalBottomSheet(
                       context: context,
                       isDismissible: true,
@@ -170,25 +134,20 @@ class _ShopTileState extends State<ShopTile> {
                           top: Radius.circular(16),
                         ),
                       ),
-                      builder: (_) {
-                        return Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Row(
-                            children: const [
-                              Icon(Icons.check_circle, color: Colors.green),
-                              SizedBox(width: 10),
-                              Text('Added to cart'),
-                            ],
-                          ),
-                        );
-                      },
+                      builder: (_) => Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
+                          children: const [
+                            Icon(Icons.check_circle, color: Colors.green),
+                            SizedBox(width: 10),
+                            Text('Added to cart'),
+                          ],
+                        ),
+                      ),
                     );
 
-                    // ⏱ auto close after 2 seconds
                     Future.delayed(const Duration(seconds: 2), () {
-                      if (Navigator.canPop(context)) {
-                        Navigator.pop(context);
-                      }
+                      if (Navigator.canPop(context)) Navigator.pop(context);
                     });
                   },
                   child: AnimatedScale(
@@ -197,9 +156,7 @@ class _ShopTileState extends State<ShopTile> {
                     child: Container(
                       padding: EdgeInsets.all(15),
                       decoration: BoxDecoration(
-                        // color: Colors.grey[900],
-                        color: Theme.of(context).colorScheme.secondary,
-
+                        color: colorScheme.secondary,
                         borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(20),
                           bottomRight: Radius.circular(10),

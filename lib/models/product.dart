@@ -6,7 +6,7 @@ class ProductModel {
   final int stock;
   final String imagePath;
   final String? categoryId;
-  final String? createdAt;
+  final int? createdAt;
 
   ProductModel({
     required this.productId,
@@ -43,7 +43,7 @@ class ProductModel {
       stock: (map['stock'] ?? 0).toInt(),
       imagePath: map['imagePath'] ?? '',
       categoryId: map['categoryId'] ?? '',
-      createdAt: map['createdAt'] ?? '',
+      createdAt: map['createdAt'] is int ? map['createdAt'] as int : null,
     );
   }
 }
