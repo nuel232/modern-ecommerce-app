@@ -1,11 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:morden_ecommerce_app/component/my_nav_bar.dart';
-import 'package:morden_ecommerce_app/models/shop.dart';
 import 'package:morden_ecommerce_app/pages/user/cart_page.dart';
 import 'package:morden_ecommerce_app/pages/user/Product_page/product_page.dart';
 import 'package:morden_ecommerce_app/pages/user/profile_page.dart';
-import 'package:morden_ecommerce_app/pages/user/settings_page.dart';
+import 'package:morden_ecommerce_app/providers/cart_provider.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -16,44 +14,31 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  //this is to control the bottom bar
   int _selectedIndex = 0;
 
-  //this method will update our index
-  //when the user taps on the navbar
   void navigateButtomBar(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    setState(() => _selectedIndex = index);
   }
 
-  final List<Widget> _pages = [
-    ProductPage(),
-    //home page
-    CartPage(),
-
-    ProfilePage(),
-  ];
+  final List<Widget> _pages = [ProductPage(), CartPage(), ProfilePage()];
 
   @override
   Widget build(BuildContext context) {
-    // Get cart item count from Shop provider
-    final shop = context.watch<Shop>();
-    final cartItemCount = shop.cart.length;
+    final cartItemCount = context.watch<CartProvider>().cart.length;
+
     return Scaffold(
       bottomNavigationBar: SafeArea(
         child: MyNavBar(
-          onTabChange: (index) => navigateButtomBar(index),
+          onTabChange: navigateButtomBar,
           text: 'Shop',
           icon: Icons.shopping_bag,
-          text2: "cart",
+          text2: 'Cart',
           icon2: Icons.shopping_cart_outlined,
           cartItemCount: cartItemCount,
-          text3: "Profile",
+          text3: 'Profile',
           icon3: Icons.person,
         ),
       ),
-
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: _pages[_selectedIndex],
     );

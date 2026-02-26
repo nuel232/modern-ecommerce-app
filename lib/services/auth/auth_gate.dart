@@ -6,6 +6,7 @@ import 'package:morden_ecommerce_app/providers/cart_provider.dart';
 import 'package:morden_ecommerce_app/providers/product_provider.dart';
 import 'package:morden_ecommerce_app/services/auth/auth_service.dart';
 import 'package:morden_ecommerce_app/services/auth/login_or_register.dart';
+import 'package:morden_ecommerce_app/services/shop/seed_service.dart';
 import 'package:provider/provider.dart';
 
 class AuthGate extends StatefulWidget {
@@ -23,18 +24,16 @@ class _AuthGateState extends State<AuthGate> {
   void initState() {
     super.initState();
     _loadInitialRole();
+    SeedService().seedProductsIfEmpty();
   }
 
   Future<void> _loadInitialRole() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       _cachedRole = await AuthService().getUserRole(user.uid);
+      _startProviders(user.uid);
     }
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-      });
-    }
+    if (mounted) setState(() => _isLoading = false);
   }
 
   void _startProviders(String uid) {
@@ -47,18 +46,15 @@ class _AuthGateState extends State<AuthGate> {
     return StreamBuilder(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
-        // User is logged in
         if (snapshot.hasData) {
-          User? user = snapshot.data!;
+          final user = snapshot.data!;
 
-          // Use cached role if available (better for hot reload)
           if (_cachedRole != null) {
             return _cachedRole == 'admin'
                 ? const AdminPage()
                 : const HomePage();
           }
 
-          // Otherwise fetch role
           return FutureBuilder<String?>(
             future: AuthService().getUserRole(user.uid),
             builder: (context, roleSnapshot) {
@@ -74,8 +70,6 @@ class _AuthGateState extends State<AuthGate> {
               }
 
               if (roleSnapshot.hasData) {
-                // Cache the role for hot reload
-
                 _cachedRole = roleSnapshot.data;
                 _startProviders(user.uid);
                 return _cachedRole == 'admin'
@@ -88,7 +82,6 @@ class _AuthGateState extends State<AuthGate> {
           );
         }
 
-        // User is not logged in
         return const LoginOrRegister();
       },
     );

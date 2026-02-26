@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:morden_ecommerce_app/models/cart_item.dart';
 import 'package:morden_ecommerce_app/models/product.dart';
-import 'package:morden_ecommerce_app/models/shop.dart';
+import 'package:morden_ecommerce_app/providers/cart_provider.dart';
 import 'package:provider/provider.dart';
 
 class CartItemsTile extends StatelessWidget {
@@ -17,7 +17,7 @@ class CartItemsTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final shop = context.read<Shop>();
+    final cart = context.read<CartProvider>();
 
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -28,15 +28,11 @@ class CartItemsTile extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Checkbox
           Checkbox(
             value: cartItem.isSelected,
-            onChanged: (value) {
-              shop.toggleCartItemSelection(cartItem.cartItemId);
-            },
+            onChanged: (_) => cart.toggleSelection(cartItem),
           ),
 
-          // Product Image
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: Image.asset(
@@ -44,20 +40,17 @@ class CartItemsTile extends StatelessWidget {
               width: 60,
               height: 60,
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  width: 60,
-                  height: 60,
-                  color: colorScheme.onPrimary,
-                  child: Icon(Icons.broken_image),
-                );
-              },
+              errorBuilder: (_, __, ___) => Container(
+                width: 60,
+                height: 60,
+                color: colorScheme.onPrimary,
+                child: Icon(Icons.broken_image),
+              ),
             ),
           ),
 
           SizedBox(width: 12),
 
-          // Product Info
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,7 +73,6 @@ class CartItemsTile extends StatelessWidget {
             ),
           ),
 
-          // Quantity Controls
           Column(
             children: [
               Row(
@@ -88,12 +80,10 @@ class CartItemsTile extends StatelessWidget {
                 children: [
                   IconButton(
                     icon: Icon(Icons.remove_circle_outline, size: 20),
-                    onPressed: () {
-                      shop.updateCartItemQuantity(
-                        cartItem.cartItemId,
-                        cartItem.quantity - 1,
-                      );
-                    },
+                    onPressed: () => cart.updateQuantity(
+                      cartItem.cartItemId,
+                      cartItem.quantity - 1,
+                    ),
                   ),
                   Text(
                     '${cartItem.quantity}',
@@ -101,21 +91,16 @@ class CartItemsTile extends StatelessWidget {
                   ),
                   IconButton(
                     icon: Icon(Icons.add_circle_outline, size: 20),
-                    onPressed: () {
-                      shop.updateCartItemQuantity(
-                        cartItem.cartItemId,
-                        cartItem.quantity + 1,
-                      );
-                    },
+                    onPressed: () => cart.updateQuantity(
+                      cartItem.cartItemId,
+                      cartItem.quantity + 1,
+                    ),
                   ),
                 ],
               ),
               IconButton(
                 icon: Icon(Icons.delete_outline, color: Colors.red),
-                onPressed: () {
-                  // Remove from cart
-                  shop.removeFromCart(cartItem);
-                },
+                onPressed: () => cart.removeFromCart(cartItem),
               ),
             ],
           ),

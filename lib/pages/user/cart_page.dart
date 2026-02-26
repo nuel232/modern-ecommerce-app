@@ -1,12 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:morden_ecommerce_app/component/cart_items_tile.dart';
 import 'package:morden_ecommerce_app/component/my_button.dart';
-import 'package:morden_ecommerce_app/models/cart_item.dart';
 import 'package:morden_ecommerce_app/pages/user/chekout_page/checkout_page.dart';
-import 'package:morden_ecommerce_app/models/shop.dart';
+import 'package:morden_ecommerce_app/providers/cart_provider.dart';
+import 'package:morden_ecommerce_app/providers/product_provider.dart';
 import 'package:provider/provider.dart';
 
 class CartPage extends StatelessWidget {
@@ -14,15 +13,16 @@ class CartPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final shop = context.watch<Shop>();
-    final CartItems = shop.cart;
-    final total = shop.getCartTotal();
+    final cart = context.watch<CartProvider>();
+    final productProvider = context.watch<ProductProvider>();
+    final cartItems = cart.cart;
+    final total = cart.getCartTotal(productProvider.products);
 
     return Scaffold(
       appBar: AppBar(
-        title: Container(child: Text('Cart')),
+        title: Text('Cart'),
         actions: [
-          if (CartItems.isNotEmpty)
+          if (cartItems.isNotEmpty)
             TextButton(
               onPressed: () {
                 showDialog(
@@ -40,11 +40,10 @@ class CartPage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(15),
                           color: Theme.of(context).colorScheme.secondary,
                         ),
-
                         child: TextButton(
                           onPressed: () {
                             Navigator.pop(context);
-                            shop.clearCart();
+                            cart.clearCart();
                           },
                           child: Text(
                             'Clear',
@@ -62,7 +61,6 @@ class CartPage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(15),
                   color: Theme.of(context).colorScheme.primary,
                 ),
-
                 child: Text(
                   'Clear',
                   style: TextStyle(
@@ -73,7 +71,7 @@ class CartPage extends StatelessWidget {
             ),
         ],
       ),
-      body: CartItems.isEmpty
+      body: cartItems.isEmpty
           ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -85,14 +83,11 @@ class CartPage extends StatelessWidget {
                       context,
                     ).colorScheme.onSurface.withOpacity(0.2),
                   ),
-
                   SizedBox(height: 20),
-
                   Text(
                     'Your cart is empty',
                     style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                   ),
-
                   SizedBox(height: 10),
                   Text('Add items to get started'),
                 ],
@@ -103,18 +98,18 @@ class CartPage extends StatelessWidget {
                 children: [
                   Expanded(
                     child: ListView.builder(
-                      itemCount: CartItems.length,
+                      itemCount: cartItems.length,
                       itemBuilder: (context, index) {
-                        final CartItem = CartItems[index];
-                        final product = shop.getProductById(CartItem.productId);
+                        final cartItem = cartItems[index];
+                        final product = productProvider.getProductById(
+                          cartItem.productId,
+                        );
 
-                        if (product == null) {
-                          return SizedBox();
-                        }
+                        if (product == null) return SizedBox();
 
                         return CartItemsTile(
                               product: product,
-                              cartItem: CartItem,
+                              cartItem: cartItem,
                             )
                             .animate()
                             .fadeIn(
@@ -130,37 +125,26 @@ class CartPage extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 15.0),
                     child: Row(
-                      // crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
                           child: Row(
                             children: [
-                              Row(
-                                children: [
-                                  // Checkbox
-                                  Checkbox(
-                                    value: shop.areAllItemsSelected(),
-                                    onChanged: (value) {
-                                      shop.toggleSelectAll();
-                                    },
-                                  ),
-
-                                  Text(
-                                    'Select All',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
+                              Checkbox(
+                                value: cart.areAllSelected(),
+                                onChanged: (_) => cart.toggleSelectAll(),
                               ),
-
+                              Text(
+                                'Select All',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
                               SizedBox(width: 10),
-
                               Flexible(
                                 child: Text(
-                                  '${shop.getSelectedItemsCount()} / ${CartItems.length} selected',
+                                  '${cart.selectedCount()} / ${cartItems.length} selected',
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: Theme.of(
@@ -176,12 +160,10 @@ class CartPage extends StatelessWidget {
 
                         MyButton(
                           borderRadius: BorderRadius.circular(18),
-                          text: 'Checkout (${shop.getCartTotal()})',
+                          text: 'Checkout (₦${total.toStringAsFixed(0)})',
                           padding: EdgeInsetsGeometry.all(15),
                           margin: EdgeInsetsGeometry.only(right: 15, left: 10),
-
                           onTap: () {
-                            //check if the user is logged in
                             final currentUser =
                                 FirebaseAuth.instance.currentUser;
 
@@ -206,26 +188,15 @@ class CartPage extends StatelessWidget {
                                         ).colorScheme.secondary,
                                       ),
                                       SizedBox(height: 20),
-                                      Text('login Required'),
+                                      Text('Login Required'),
                                       Text(
                                         'Please login or create an account to checkout',
                                         textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.onSurface,
-                                        ),
                                       ),
                                       SizedBox(height: 20),
                                       MyButton(
                                         text: 'Login / Sign Up',
-                                        onTap: () {
-                                          Navigator.pop(
-                                            context,
-                                          ); // Close bottom sheet
-                                          // Note: AuthGate will automatically show login
-                                          // when user signs out and tries to access
-                                        },
+                                        onTap: () => Navigator.pop(context),
                                       ),
                                       SizedBox(height: 10),
                                       TextButton(
@@ -237,12 +208,7 @@ class CartPage extends StatelessWidget {
                                 ),
                               );
                             } else {
-                              // User is logged in, proceed to checkout
-                              final selectedItems = shop.cart
-                                  .where((item) => item.isSelected)
-                                  .toList();
-
-                              if (selectedItems.isEmpty) {
+                              if (cart.selectedItems.isEmpty) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(
@@ -252,11 +218,10 @@ class CartPage extends StatelessWidget {
                                 );
                                 return;
                               }
-
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => CheckoutPage(),
+                                  builder: (_) => CheckoutPage(),
                                 ),
                               );
                             }

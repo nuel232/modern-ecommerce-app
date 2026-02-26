@@ -1,15 +1,14 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:morden_ecommerce_app/component/shop_tile.dart';
-import 'package:morden_ecommerce_app/models/shop.dart';
+import 'package:morden_ecommerce_app/models/category_model.dart';
+import 'package:morden_ecommerce_app/providers/cart_provider.dart';
+import 'package:morden_ecommerce_app/providers/product_provider.dart';
 import 'package:morden_ecommerce_app/pages/user/Product_page/widgets/category_chip_widgets.dart';
 import 'package:morden_ecommerce_app/pages/user/Product_page/widgets/search_bar_delegate.dart';
 import 'package:morden_ecommerce_app/pages/user/cart_page.dart';
 import 'package:provider/provider.dart';
-import 'package:morden_ecommerce_app/models/category_model.dart';
 
 class ProductPage extends StatefulWidget {
   const ProductPage({super.key});
@@ -20,7 +19,6 @@ class ProductPage extends StatefulWidget {
 
 class _ProductPageState extends State<ProductPage> {
   final TextEditingController searchController = TextEditingController();
-  String selectedCategory = 'Cat_000';
 
   @override
   void dispose() {
@@ -31,18 +29,15 @@ class _ProductPageState extends State<ProductPage> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final products = context.watch<Shop>();
-    final allProducts = products.shop; // For Hot Picks
-    final filteredProducts = products.getProductsByCategory(
-      selectedCategory,
-    ); // For All Products
+    final productProvider = context.watch<ProductProvider>();
+    final allProducts = productProvider.products;
+    final filteredProducts = productProvider.filteredProducts;
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
       body:
           CustomScrollView(
                 slivers: [
-                  // App bar with "Shop" title that scrolls away
                   SliverAppBar(
                     pinned: true,
                     floating: false,
@@ -63,7 +58,6 @@ class _ProductPageState extends State<ProductPage> {
                     ),
                   ),
 
-                  // Fixed search bar and cart icon
                   SliverPersistentHeader(
                     pinned: true,
                     delegate: SearchBarDelegate(
@@ -72,15 +66,13 @@ class _ProductPageState extends State<ProductPage> {
                       onCartPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => const CartPage(),
-                          ),
+                          MaterialPageRoute(builder: (_) => const CartPage()),
                         );
                       },
                     ),
                   ),
 
-                  // Hot Picks Section
+                  // Hot Picks
                   SliverToBoxAdapter(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -115,11 +107,12 @@ class _ProductPageState extends State<ProductPage> {
                                 ),
                                 itemCount: allProducts.length,
                                 itemBuilder: (context, index) {
-                                  final product = allProducts[index];
                                   return Container(
                                     width: 180,
                                     margin: const EdgeInsets.only(right: 16),
-                                    child: ShopTile(product: product),
+                                    child: ShopTile(
+                                      product: allProducts[index],
+                                    ),
                                   );
                                 },
                               ),
@@ -130,12 +123,12 @@ class _ProductPageState extends State<ProductPage> {
                               delay: 400.ms,
                               duration: 600.ms,
                               curve: Curves.fastLinearToSlowEaseIn,
-                            ), // SlideInDown
+                            ),
                       ],
                     ),
                   ),
 
-                  // All Products Section Header
+                  // All Products header
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(16, 24, 16, 12),
@@ -162,19 +155,19 @@ class _ProductPageState extends State<ProductPage> {
                           return CategoryChipWidgets(
                             categoryId: category.categoryId,
                             categoryName: category.name,
-                            isSelected: selectedCategory == category.categoryId,
-                            onTap: () {
-                              setState(() {
-                                selectedCategory = category.categoryId;
-                              });
-                            },
+                            isSelected:
+                                productProvider.selectedCategory ==
+                                category.categoryId,
+                            onTap: () => productProvider.setCategory(
+                              category.categoryId,
+                            ),
                           );
                         }).toList(),
                       ),
                     ),
                   ),
 
-                  // All Products Grid
+                  // Products Grid
                   SliverPadding(
                     padding: const EdgeInsets.all(16),
                     sliver: SliverGrid(
@@ -185,18 +178,11 @@ class _ProductPageState extends State<ProductPage> {
                             mainAxisSpacing: 16,
                             childAspectRatio: 0.75,
                           ),
-                      delegate: SliverChildBuilderDelegate((context, index) {
-                        try {
-                          final product = filteredProducts[index];
-                          return ShopTile(product: product);
-                        } catch (e) {
-                          print('Error rendering product at index $index: $e');
-                          return Container(
-                            color: Colors.red[100],
-                            child: Center(child: Text('Error loading product')),
-                          );
-                        }
-                      }, childCount: filteredProducts.length),
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) =>
+                            ShopTile(product: filteredProducts[index]),
+                        childCount: filteredProducts.length,
+                      ),
                     ),
                   ),
                 ],

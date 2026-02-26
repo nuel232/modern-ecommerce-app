@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:morden_ecommerce_app/models/product.dart';
+import 'package:morden_ecommerce_app/services/shop/product_service.dart';
 
 class ProductProvider extends ChangeNotifier {
-  final ProductProvider _productService = ProductProvider();
+  final ProductService _productService = ProductService();
 
   //list of products
   List<ProductModel> _products = [];
