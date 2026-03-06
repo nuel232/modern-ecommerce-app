@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:morden_ecommerce_app/pages/user/chekout_page/widgets/address_widget.dart';
+import 'package:morden_ecommerce_app/pages/user/chekout_page/widgets/order_summary.dart';
 
 class CheckoutPage extends StatelessWidget {
   const CheckoutPage({super.key});
@@ -29,6 +30,7 @@ class CheckoutPage extends StatelessWidget {
               AddressWidget(),
 
               //order summary
+              OrderSummary(),
 
               //delivery method
               Container(),

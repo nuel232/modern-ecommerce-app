@@ -9,10 +9,20 @@ class CartService {
 
   // Stream all cart items for a user
   Stream<List<CartItem>> getCartStream(String uid) {
-    return _cartRef(uid).snapshots().map(
-      (snapshot) =>
-          snapshot.docs.map((doc) => CartItem.fromMap(doc.data())).toList(),
-    );
+    return _cartRef(uid).snapshots().map((snapshot) {
+      final items = <CartItem>[];
+      for (final doc in snapshot.docs) {
+        try {
+          final data = doc.data();
+          // Ensure required fields exist before parsing
+          if (data['productId'] == null || data['cartItemId'] == null) continue;
+          items.add(CartItem.fromMap(data));
+        } catch (e) {
+          print('CartService: skipping malformed cart doc ${doc.id}: $e');
+        }
+      }
+      return items;
+    });
   }
 
   // Add or increment quantity if product already in cart
