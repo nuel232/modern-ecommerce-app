@@ -28,14 +28,14 @@ class _LoginPageState extends State<LoginPage> {
   //login method
   void login(BuildContext context) async {
     //authservice
-    final _authService = AuthService();
+    final authService = AuthService();
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => const Center(child: CircularProgressIndicator()),
     );
     try {
-      await _authService.signInWithEmailAndPassword(
+      await authService.signInWithEmailAndPassword(
         emailController.text,
         passwordController.text,
       );

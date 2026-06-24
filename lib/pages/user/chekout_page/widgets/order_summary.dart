@@ -23,19 +23,6 @@ class OrderSummary extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
-            child: Text(
-              'Order Summary (${selectedItems.length} item${selectedItems.length == 1 ? '' : 's'})',
-              style: GoogleFonts.poppins(
-                fontWeight: FontWeight.bold,
-                fontSize: 15,
-              ),
-            ),
-          ),
-
-          const Divider(height: 1),
-
           ListView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -113,30 +100,6 @@ class OrderSummary extends StatelessWidget {
                 ),
               );
             },
-          ),
-
-          const Divider(height: 1),
-
-          // Grand total row
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Total',
-                  style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  '₦${cart.getCartTotal(productProvider.products).toStringAsFixed(0)}',
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green,
-                    fontSize: 16,
-                  ),
-                ),
-              ],
-            ),
           ),
         ],
       ),

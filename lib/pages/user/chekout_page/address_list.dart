@@ -1,11 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:morden_ecommerce_app/component/my_button.dart';
 import 'package:morden_ecommerce_app/models/address_model.dart';
-import 'package:morden_ecommerce_app/models/cart_item.dart';
 import 'package:morden_ecommerce_app/models/user.dart';
 import 'package:morden_ecommerce_app/pages/user/chekout_page/address_form.dart';
 

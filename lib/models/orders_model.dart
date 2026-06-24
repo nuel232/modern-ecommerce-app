@@ -1,6 +1,4 @@
 import 'package:morden_ecommerce_app/models/cart_model.dart';
-import 'package:morden_ecommerce_app/models/product.dart';
-import 'package:morden_ecommerce_app/models/shop.dart';
 
 class OrdersModel {
   final String orderId;

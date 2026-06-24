@@ -1,7 +1,6 @@
 // Create this file at: lib/models/user_model.dart
 
 import 'package:morden_ecommerce_app/models/address_model.dart';
-import 'package:morden_ecommerce_app/models/cart_item.dart';
 
 class UserModel {
   final String uid;

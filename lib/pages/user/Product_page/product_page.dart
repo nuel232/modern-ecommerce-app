@@ -3,7 +3,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:morden_ecommerce_app/component/shop_tile.dart';
 import 'package:morden_ecommerce_app/models/category_model.dart';
-import 'package:morden_ecommerce_app/providers/cart_provider.dart';
 import 'package:morden_ecommerce_app/providers/product_provider.dart';
 import 'package:morden_ecommerce_app/pages/user/Product_page/widgets/category_chip_widgets.dart';
 import 'package:morden_ecommerce_app/pages/user/Product_page/widgets/search_bar_delegate.dart';

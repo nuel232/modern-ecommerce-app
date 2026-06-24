@@ -7,7 +7,7 @@ import 'package:morden_ecommerce_app/services/auth/auth_service.dart';
 class RegisterPage extends StatefulWidget {
   final void Function()? onTap;
 
-  RegisterPage({super.key, required this.onTap});
+  const RegisterPage({super.key, required this.onTap});
 
   @override
   State<RegisterPage> createState() => _RegisterPageState();
@@ -29,7 +29,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   void signUp(BuildContext context) async {
     //authservice instance
-    final _authservice = AuthService();
+    final authservice = AuthService();
 
     if (passwordController.text == confirmPasswordController.text) {
       showDialog(
@@ -38,7 +38,7 @@ class _RegisterPageState extends State<RegisterPage> {
         builder: (context) => const Center(child: CircularProgressIndicator()),
       );
       try {
-        await _authservice.signUpWithEmailAndPassword(
+        await authservice.signUpWithEmailAndPassword(
           emailController.text,
           passwordController.text,
           name: nameController.text,

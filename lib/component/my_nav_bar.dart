@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
-import 'package:badges/badges.dart' as badges;
 
 class MyNavBar extends StatelessWidget {
   final Function(int)? onTabChange;
