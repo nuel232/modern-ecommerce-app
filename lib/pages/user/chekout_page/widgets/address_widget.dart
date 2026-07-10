@@ -52,7 +52,16 @@ class AddressWidget extends StatelessWidget {
               ),
 
               child: ListTile(
-                title: Text('Shipping Address'),
+                title: Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Text(
+                    'Shipping Address',
+                    style: GoogleFonts.dmSans(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
 
                 subtitle: addresses.isEmpty
                     ? Text(

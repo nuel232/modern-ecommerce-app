@@ -28,10 +28,13 @@ class _ShippingMethodState extends State<ShippingMethod> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.all(10.0),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               child: Text(
                 'Shipping Method',
-                style: GoogleFonts.dmSans(fontWeight: FontWeight.bold),
+                style: GoogleFonts.dmSans(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
               ),
             ),
 
@@ -39,6 +42,12 @@ class _ShippingMethodState extends State<ShippingMethod> {
               title: Text('Standard Shipping'),
               subtitle: Text('3-10 working days'),
               trailing: Checkbox(
+                checkColor: Theme.of(context).colorScheme.onSecondary,
+                activeColor: Theme.of(context).colorScheme.secondary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4),
+                ),
+
                 value: _selectedShipping == Method.standard,
                 onChanged: (value) {
                   setState(() {
@@ -52,24 +61,15 @@ class _ShippingMethodState extends State<ShippingMethod> {
               title: Text('Express Shipping'),
               subtitle: Text('1-3 working days'),
               trailing: Checkbox(
+                checkColor: Theme.of(context).colorScheme.onSecondary,
+                activeColor: Theme.of(context).colorScheme.secondary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4),
+                ),
                 value: _selectedShipping == Method.express,
                 onChanged: (value) {
                   setState(() {
                     _selectedShipping = value == true ? Method.express : null;
-                  });
-                },
-              ),
-            ),
-
-            ListTile(
-              title: Text('Overnight Shipping'),
-              subtitle: Text('Next day delivery'),
-              trailing: Checkbox(
-                value: _selectedShipping == Method.overnight,
-                splashRadius: 12,
-                onChanged: (value) {
-                  setState(() {
-                    _selectedShipping = value == true ? Method.overnight : null;
                   });
                 },
               ),

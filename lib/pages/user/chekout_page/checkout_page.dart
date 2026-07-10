@@ -6,6 +6,7 @@ import 'package:morden_ecommerce_app/component/my_button.dart';
 import 'package:morden_ecommerce_app/pages/user/chekout_page/widgets/Shipping_method.dart';
 import 'package:morden_ecommerce_app/pages/user/chekout_page/widgets/address_widget.dart';
 import 'package:morden_ecommerce_app/pages/user/chekout_page/widgets/order_summary.dart';
+import 'package:morden_ecommerce_app/pages/user/chekout_page/widgets/payment_method.dart';
 import 'package:morden_ecommerce_app/providers/cart_provider.dart';
 import 'package:morden_ecommerce_app/providers/product_provider.dart';
 import 'package:provider/provider.dart';
@@ -33,56 +34,64 @@ class CheckoutPage extends StatelessWidget {
           if (!snapshot.hasData || !snapshot.data!.exists) {
             return const Center(child: Text('user data not found'));
           }
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          return SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
-            children: [
-              //users address
-              AddressWidget(),
+              children: [
+                AddressWidget(),
 
-              //order summary
-              OrderSummary(),
+                //order summary
+                OrderSummary(),
 
-              //delivery method
-              ShippingMethod(),
+                //delivery method
+                ShippingMethod(),
 
-              //Promo code
+                //Promo code
 
-              //payment method
+                //payment method
+                PaymentMethod(),
 
-              //special instruction
-
-              //price breakdown
-
-              //Terms and conditions
-
-              //place order button
-              Column(
-                children: [
-                  Row(
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 8.0,
+                  ),
+                  child: Column(
                     children: [
-                      Text(
-                        'Total',
-                        style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        '₦${cart.getCartTotal(productProvider.products).toStringAsFixed(0)}',
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green,
-                          fontSize: 16,
-                        ),
-                      ),
+                      Row(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Subtotal',
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                '₦${cart.getCartTotal(productProvider.products).toStringAsFixed(0)}',
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.green,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
 
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: MyButton(text: 'submit', onTap: () {}),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: MyButton(text: 'submit', onTap: () {}),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
-              ),
-            ],
+                ),
+              ],
+            ),
           );
         },
       ),
