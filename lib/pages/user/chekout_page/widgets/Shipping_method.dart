@@ -4,14 +4,19 @@ import 'package:google_fonts/google_fonts.dart';
 enum Method { standard, express, overnight }
 
 class ShippingMethod extends StatefulWidget {
-  const ShippingMethod({super.key});
+  final Method? selectedShipping;
+  final ValueChanged<Method?> onChanged;
+  const ShippingMethod({
+    super.key,
+    required this.onChanged,
+    required this.selectedShipping,
+  });
 
   @override
   State<ShippingMethod> createState() => _ShippingMethodState();
 }
 
 class _ShippingMethodState extends State<ShippingMethod> {
-  Method? _selectedShipping;
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -48,10 +53,10 @@ class _ShippingMethodState extends State<ShippingMethod> {
                   borderRadius: BorderRadius.circular(4),
                 ),
 
-                value: _selectedShipping == Method.standard,
+                value: widget.selectedShipping == Method.standard,
                 onChanged: (value) {
                   setState(() {
-                    _selectedShipping = value == true ? Method.standard : null;
+                    widget.onChanged(value == true ? Method.standard : null);
                   });
                 },
               ),
@@ -66,10 +71,10 @@ class _ShippingMethodState extends State<ShippingMethod> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(4),
                 ),
-                value: _selectedShipping == Method.express,
+                value: widget.selectedShipping == Method.standard,
                 onChanged: (value) {
                   setState(() {
-                    _selectedShipping = value == true ? Method.express : null;
+                    widget.onChanged(value == true ? Method.standard : null);
                   });
                 },
               ),

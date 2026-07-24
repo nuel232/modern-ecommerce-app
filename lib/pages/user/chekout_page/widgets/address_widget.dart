@@ -6,10 +6,22 @@ import 'package:morden_ecommerce_app/models/address_model.dart';
 import 'package:morden_ecommerce_app/models/user.dart';
 import 'package:morden_ecommerce_app/pages/user/chekout_page/address_form.dart';
 import 'package:morden_ecommerce_app/pages/user/chekout_page/address_list.dart';
+import 'package:morden_ecommerce_app/pages/user/chekout_page/widgets/Shipping_method.dart';
 
-class AddressWidget extends StatelessWidget {
-  const AddressWidget({super.key});
+class AddressWidget extends StatefulWidget {
+  final AddressModel? selectedAddress;
+  final ValueChanged<AddressModel?> onChanged;
+  const AddressWidget({
+    super.key,
+    this.selectedAddress,
+    required this.onChanged,
+  });
 
+  @override
+  State<AddressWidget> createState() => _AddressWidgetState();
+}
+
+class _AddressWidgetState extends State<AddressWidget> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
