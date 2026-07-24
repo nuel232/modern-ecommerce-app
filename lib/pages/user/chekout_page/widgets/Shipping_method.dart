@@ -55,9 +55,7 @@ class _ShippingMethodState extends State<ShippingMethod> {
 
                 value: widget.selectedShipping == Method.standard,
                 onChanged: (value) {
-                  setState(() {
-                    widget.onChanged(value == true ? Method.standard : null);
-                  });
+                  widget.onChanged(value == true ? Method.standard : null);
                 },
               ),
             ),
@@ -71,11 +69,9 @@ class _ShippingMethodState extends State<ShippingMethod> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(4),
                 ),
-                value: widget.selectedShipping == Method.standard,
+                value: widget.selectedShipping == Method.express,
                 onChanged: (value) {
-                  setState(() {
-                    widget.onChanged(value == true ? Method.standard : null);
-                  });
+                  widget.onChanged(value == true ? Method.express : null);
                 },
               ),
             ),
