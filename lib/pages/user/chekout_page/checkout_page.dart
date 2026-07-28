@@ -23,26 +23,38 @@ class CheckoutPage extends StatefulWidget {
 class _CheckoutPageState extends State<CheckoutPage> {
   Method? _selectedShippingMethod;
   AddressModel? _selectedAddress;
-  double? _shippingCost;
-  bool _loadingShipping = false;
-  String? _shippingError;
+  final ValueNotifier<double?> _shippingCost = ValueNotifier(null);
+  final ValueNotifier<bool> _loadingShipping = ValueNotifier(false);
+  final ValueNotifier<String?> _shippingError = ValueNotifier(null);
   String? _lastCalculatedKey; // avoid recalculating for the same inputs
 
+  @override
+  void dispose() {
+    _shippingCost.dispose();
+    _loadingShipping.dispose();
+    _shippingError.dispose();
+    super.dispose();
+  }
+
   Future<void> _maybeCalculateShipping() async {
-    if (_selectedAddress == null || _selectedShippingMethod == null) return;
+    print(
+      'CALC CALLED — address: ${_selectedAddress?.fullAddress}, method: $_selectedShippingMethod',
+    );
+    if (_selectedAddress == null || _selectedShippingMethod == null) {
+      print('CALC SKIPPED — address or method is null');
+      return;
+    }
 
     final destination = _selectedAddress!.fullAddress;
-    if (destination.isEmpty) return; // address not fully loaded yet
+    if (destination.isEmpty) return;
 
     final isExpress = _selectedShippingMethod == Method.express;
     final key = '$destination|$isExpress';
-    if (key == _lastCalculatedKey) return; // nothing actually changed
+    if (key == _lastCalculatedKey) return;
     _lastCalculatedKey = key;
 
-    setState(() {
-      _loadingShipping = true;
-      _shippingError = null;
-    });
+    _loadingShipping.value = true;
+    _shippingError.value = null;
 
     try {
       final cost = await ShippingService.calculateShippingCost(
@@ -50,16 +62,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
         isExpress: isExpress,
       );
       if (!mounted) return;
-      setState(() {
-        _shippingCost = cost;
-        _loadingShipping = false;
-      });
+      _shippingCost.value = cost;
+      _loadingShipping.value = false;
     } catch (e) {
+      print('SHIPPING CALC ERROR: $e'); // <-- add this
       if (!mounted) return;
-      setState(() {
-        _shippingError = 'Could not calculate shipping';
-        _loadingShipping = false;
-      });
+      _shippingError.value = 'Could not calculate shipping';
+      _loadingShipping.value = false;
     }
   }
 
@@ -69,10 +78,17 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
     final productProvider = context.watch<ProductProvider>();
     // final ShippingMethod? _selectedShippingMethod = null;
-    final Subtotal = cart
-        .getCartTotal(productProvider.products)
-        .toStringAsFixed(0);
+    final subtotalValue = cart.getCartTotal(productProvider.products);
+    final Subtotal = subtotalValue.toStringAsFixed(0);
 
+    final shipping = _shippingCost.value ?? 0;
+    final vatableAmount = subtotalValue + shipping;
+    final vat = vatableAmount * 0.075;
+
+    final total =
+        subtotalValue +
+        shipping +
+        vat; // (minus discount, once that's added)// (minus discount, once wired up) — double ✅minus discount, once that's wired up)
     return Scaffold(
       appBar: AppBar(),
       body: StreamBuilder(
@@ -182,7 +198,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                                             .spaceBetween,
                                                     children: [
                                                       Text('Subtotal:'),
-                                                      Text('₦${Subtotal}'),
+                                                      Text('₦ ${Subtotal}'),
                                                     ],
                                                   ),
                                                   Row(
@@ -191,16 +207,40 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                                             .spaceBetween,
                                                     children: [
                                                       Text('Shipping:'),
-                                                      Text(
-                                                        _loadingShipping
-                                                            ? 'Calculating...'
-                                                            : _shippingError !=
-                                                                  null
-                                                            ? _shippingError!
-                                                            : _shippingCost !=
-                                                                  null
-                                                            ? '₦${_shippingCost!.toStringAsFixed(0)}'
-                                                            : '—',
+                                                      ValueListenableBuilder<
+                                                        double?
+                                                      >(
+                                                        valueListenable:
+                                                            _shippingCost,
+                                                        builder: (context, cost, _) {
+                                                          return ValueListenableBuilder<
+                                                            bool
+                                                          >(
+                                                            valueListenable:
+                                                                _loadingShipping,
+                                                            builder: (context, loading, _) {
+                                                              return ValueListenableBuilder<
+                                                                String?
+                                                              >(
+                                                                valueListenable:
+                                                                    _shippingError,
+                                                                builder: (context, error, _) {
+                                                                  return Text(
+                                                                    loading
+                                                                        ? 'Calculating...'
+                                                                        : error !=
+                                                                              null
+                                                                        ? error
+                                                                        : cost !=
+                                                                              null
+                                                                        ? '₦ ${cost.toStringAsFixed(0)}'
+                                                                        : '—',
+                                                                  );
+                                                                },
+                                                              );
+                                                            },
+                                                          );
+                                                        },
                                                       ),
                                                     ],
                                                   ),
@@ -219,7 +259,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                                             .spaceBetween,
                                                     children: [
                                                       Text('VAT:'),
-                                                      Text('₦'),
+                                                      Text(
+                                                        '- ₦ ${vat.toStringAsFixed(0)}',
+                                                        style: TextStyle(
+                                                          color: Colors.red,
+                                                        ),
+                                                      ),
                                                     ], // Update this line
                                                   ),
                                                 ],

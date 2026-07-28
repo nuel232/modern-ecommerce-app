@@ -9,7 +9,7 @@ class ShippingConfig {
   static Future<Map<String, double>> fetchRates() async {
     final doc = await FirebaseFirestore.instance
         .collection('config')
-        .doc('shipping_rates')
+        .doc('shipping')
         .get();
     return {
       'baseFee': (doc['baseFee'] ?? 500).toDouble(),
