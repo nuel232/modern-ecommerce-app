@@ -23,6 +23,46 @@ class CheckoutPage extends StatefulWidget {
 class _CheckoutPageState extends State<CheckoutPage> {
   Method? _selectedShippingMethod;
   AddressModel? _selectedAddress;
+  double? _shippingCost;
+  bool _loadingShipping = false;
+  String? _shippingError;
+  String? _lastCalculatedKey; // avoid recalculating for the same inputs
+
+  Future<void> _maybeCalculateShipping() async {
+    if (_selectedAddress == null || _selectedShippingMethod == null) return;
+
+    final destination = _selectedAddress!.fullAddress;
+    if (destination.isEmpty) return; // address not fully loaded yet
+
+    final isExpress = _selectedShippingMethod == Method.express;
+    final key = '$destination|$isExpress';
+    if (key == _lastCalculatedKey) return; // nothing actually changed
+    _lastCalculatedKey = key;
+
+    setState(() {
+      _loadingShipping = true;
+      _shippingError = null;
+    });
+
+    try {
+      final cost = await ShippingService.calculateShippingCost(
+        destinationAddress: destination,
+        isExpress: isExpress,
+      );
+      if (!mounted) return;
+      setState(() {
+        _shippingCost = cost;
+        _loadingShipping = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _shippingError = 'Could not calculate shipping';
+        _loadingShipping = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final cart = context.watch<CartProvider>();
@@ -32,10 +72,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
     final Subtotal = cart
         .getCartTotal(productProvider.products)
         .toStringAsFixed(0);
-    final shippingCost = ShippingService.calculateShippingCost(
-      destinationAddress: _selectedAddress?.fullAddress ?? '',
-      isExpress: _selectedShippingMethod == Method.express,
-    );
 
     return Scaffold(
       appBar: AppBar(),
@@ -61,9 +97,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       AddressWidget(
                         selectedAddress: _selectedAddress,
                         onChanged: (address) {
-                          setState(() {
-                            _selectedAddress = address;
-                          });
+                          setState(() => _selectedAddress = address);
+                          _maybeCalculateShipping();
                         },
                       ),
                       //order summary
@@ -73,9 +108,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       ShippingMethod(
                         selectedShipping: _selectedShippingMethod,
                         onChanged: (method) {
-                          setState(() {
-                            _selectedShippingMethod = method;
-                          });
+                          setState(() => _selectedShippingMethod = method);
+                          _maybeCalculateShipping();
                         },
                       ),
                       //Promo code
@@ -115,82 +149,88 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             context: context,
                             builder: (BuildContext context) {
                               return StatefulBuilder(
-                                builder:
-                                    (
-                                      BuildContext context,
-                                      StateSetter setmodalstate,
-                                    ) {
-                                      return SizedBox(
-                                        height: 300,
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Column(
-                                            children: [
-                                              const Padding(
-                                                padding: EdgeInsets.all(10),
-                                                child: Text(
-                                                  "Price Details",
-                                                  style: TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
+                                builder: (BuildContext context, StateSetter setmodalstate) {
+                                  return SizedBox(
+                                    height: 300,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Column(
+                                        children: [
+                                          const Padding(
+                                            padding: EdgeInsets.all(10),
+                                            child: Text(
+                                              "Price Details",
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
                                               ),
-                                              const Divider(thickness: 0.3),
-                                              Expanded(
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                        horizontal: 8.0,
-                                                        vertical: 8.0,
-                                                      ),
-                                                  child: Column(
+                                            ),
+                                          ),
+                                          const Divider(thickness: 0.3),
+                                          Expanded(
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 8.0,
+                                                    vertical: 8.0,
+                                                  ),
+                                              child: Column(
+                                                children: [
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
                                                     children: [
-                                                      Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: [
-                                                          Text('Subtotal:'),
-                                                          Text('₦${Subtotal}'),
-                                                        ],
-                                                      ),
-                                                      Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: [
-                                                          Text('Shipping:'),
-                                                          Text('₦'),
-                                                        ],
-                                                      ),
-                                                      Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: [
-                                                          Text('Discount:'),
-                                                          Text('₦'),
-                                                        ], // Update this line
-                                                      ),
-                                                      Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: [
-                                                          Text('VAT:'),
-                                                          Text('₦'),
-                                                        ], // Update this line
+                                                      Text('Subtotal:'),
+                                                      Text('₦${Subtotal}'),
+                                                    ],
+                                                  ),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Text('Shipping:'),
+                                                      Text(
+                                                        _loadingShipping
+                                                            ? 'Calculating...'
+                                                            : _shippingError !=
+                                                                  null
+                                                            ? _shippingError!
+                                                            : _shippingCost !=
+                                                                  null
+                                                            ? '₦${_shippingCost!.toStringAsFixed(0)}'
+                                                            : '—',
                                                       ),
                                                     ],
                                                   ),
-                                                ),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Text('Discount:'),
+                                                      Text('₦'),
+                                                    ], // Update this line
+                                                  ),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Text('VAT:'),
+                                                      Text('₦'),
+                                                    ], // Update this line
+                                                  ),
+                                                ],
                                               ),
-                                            ],
+                                            ),
                                           ),
-                                        ),
-                                      );
-                                    },
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
                               );
                             },
                           );

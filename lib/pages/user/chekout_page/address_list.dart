@@ -53,7 +53,7 @@ class AddressList extends StatelessWidget {
           ),
         ),
 
-        Divider(height: 0.5),
+        Divider(height: 0.5, color: Colors.grey.shade700),
         Expanded(
           child: StreamBuilder(
             stream: getAddresses(),
@@ -89,12 +89,9 @@ class AddressList extends StatelessWidget {
                       Navigator.pop(context);
                     },
                     child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 10,
-                      ),
+                      padding: EdgeInsets.symmetric(vertical: 10),
                       margin: EdgeInsets.symmetric(
-                        horizontal: 20,
+                        horizontal: 10,
                         vertical: 10,
                       ),
                       decoration: BoxDecoration(

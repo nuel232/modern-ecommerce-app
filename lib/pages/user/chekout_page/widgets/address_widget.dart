@@ -49,10 +49,15 @@ class _AddressWidgetState extends State<AddressWidget> {
             orElse: () => addresses.first,
           );
         }
-        // Tell the parent which address is active, after this frame finishes building
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          widget.onChanged(address);
-        });
+
+        // Only notify the parent if this address is actually different
+        // from what it already has — prevents an infinite rebuild loop.
+        if (address?.addressId != widget.selectedAddress?.addressId) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            widget.onChanged(address);
+          });
+        }
+
         return Column(
           children: [
             //users address
