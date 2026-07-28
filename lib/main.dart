@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:morden_ecommerce_app/firebase_options.dart';
 import 'package:morden_ecommerce_app/models/shop.dart';
 import 'package:morden_ecommerce_app/providers/cart_provider.dart';
@@ -12,6 +13,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Initialize Firebase with the generated options
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await dotenv.load(fileName: ".env");
 
   runApp(
     MultiProvider(

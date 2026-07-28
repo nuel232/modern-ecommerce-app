@@ -10,6 +10,7 @@ import 'package:morden_ecommerce_app/pages/user/chekout_page/widgets/order_summa
 import 'package:morden_ecommerce_app/pages/user/chekout_page/widgets/payment_method.dart';
 import 'package:morden_ecommerce_app/providers/cart_provider.dart';
 import 'package:morden_ecommerce_app/providers/product_provider.dart';
+import 'package:morden_ecommerce_app/services/shop/shipping_service.dart';
 import 'package:provider/provider.dart';
 
 class CheckoutPage extends StatefulWidget {
@@ -25,11 +26,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
   @override
   Widget build(BuildContext context) {
     final cart = context.watch<CartProvider>();
+
     final productProvider = context.watch<ProductProvider>();
     // final ShippingMethod? _selectedShippingMethod = null;
     final Subtotal = cart
         .getCartTotal(productProvider.products)
         .toStringAsFixed(0);
+    final shippingCost = ShippingService.calculateShippingCost(
+      destinationAddress: _selectedAddress?.fullAddress ?? '',
+      isExpress: _selectedShippingMethod == Method.express,
+    );
 
     return Scaffold(
       appBar: AppBar(),

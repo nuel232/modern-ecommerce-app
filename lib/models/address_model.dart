@@ -21,6 +21,8 @@ class AddressModel {
     required this.isDefault,
   });
 
+  String get fullAddress => '$streetAddress, $city, $state';
+
   //convert address to a map (storing in Firestore)
   Map<String, dynamic> toMap() {
     return {
