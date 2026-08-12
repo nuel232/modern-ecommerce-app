@@ -12,6 +12,7 @@ import 'package:morden_ecommerce_app/providers/cart_provider.dart';
 import 'package:morden_ecommerce_app/providers/product_provider.dart';
 import 'package:morden_ecommerce_app/services/shop/shipping_service.dart';
 import 'package:provider/provider.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 
 class CheckoutPage extends StatefulWidget {
   const CheckoutPage({super.key});
@@ -69,6 +70,21 @@ class _CheckoutPageState extends State<CheckoutPage> {
       if (!mounted) return;
       _shippingError.value = 'Could not calculate shipping';
       _loadingShipping.value = false;
+    }
+  }
+
+  Future<void> _testInitializeTransaction() async {
+    try {
+      final callable = FirebaseFunctions.instance.httpsCallable(
+        'initializeTransaction',
+      );
+      final result = await callable.call({
+        'shippingCost': _shippingCost.value ?? 0,
+        'email': FirebaseAuth.instance.currentUser!.email,
+      });
+      print('SUCCESS: ${result.data}');
+    } catch (e) {
+      print('FUNCTION ERROR: $e');
     }
   }
 
