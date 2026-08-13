@@ -50,6 +50,7 @@ dependencies:
   cloud_functions: ^6.0.3
 
   flutter_dotenv: ^5.1.0
+  webview_flutter: ^4.14.1
 
 dev_dependencies:
   flutter_test:

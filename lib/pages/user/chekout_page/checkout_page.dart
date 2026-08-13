@@ -27,7 +27,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
   final ValueNotifier<double?> _shippingCost = ValueNotifier(null);
   final ValueNotifier<bool> _loadingShipping = ValueNotifier(false);
   final ValueNotifier<String?> _shippingError = ValueNotifier(null);
-  String? _lastCalculatedKey; // avoid recalculating for the same inputs
+  String? _lastCalculatedKey; 
+  bool _isProcessing = false;
 
   @override
   void dispose() {
@@ -73,7 +74,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
     }
   }
 
-  Future<void> _testInitializeTransaction() async {
+  Future<void> _startPayment() async {
     try {
       final callable = FirebaseFunctions.instance.httpsCallable(
         'initializeTransaction',
@@ -104,7 +105,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
     final total =
         subtotalValue +
         shipping +
-        vat; // (minus discount, once that's added)// (minus discount, once wired up) — double ✅minus discount, once that's wired up)
+        vat; 
     return Scaffold(
       appBar: AppBar(),
       body: StreamBuilder(
@@ -163,7 +164,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       ).colorScheme.surface.withOpacity(1),
                       spreadRadius: 2,
                       blurRadius: 5,
-                      offset: const Offset(0, -3), // changes position of shadow
+                      offset: const Offset(0, -3), 
                     ),
                   ],
                 ),
@@ -326,7 +327,26 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           horizontal: 20,
                         ),
                         borderRadius: BorderRadius.circular(5),
-                        onTap: () {},
+                        onTap: _isProcessing
+                            ? null
+                            : () async {
+                                setState(() => _isProcessing = true);
+                                try {
+                                  await _startPayment();
+                                } catch (e) {
+                                  if (!mounted) return;
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Payment failed to start: $e',
+                                      ),
+                                    ),
+                                  );
+                                } finally {
+                                  if (mounted)
+                                    setState(() => _isProcessing = false);
+                                }
+                              },
                       ),
                     ],
                   ),

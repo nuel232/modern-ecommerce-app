@@ -99,9 +99,11 @@ exports.initializeTransaction = onCall(
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
+
               email,
               amount: amountInKobo,
               metadata: {uid},
+              callback_url: 'myapp://payment-complete',
             }),
           },
       );
