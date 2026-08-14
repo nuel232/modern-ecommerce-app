@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:morden_ecommerce_app/component/my_button.dart';
 import 'package:morden_ecommerce_app/models/address_model.dart';
+import 'package:morden_ecommerce_app/pages/user/chekout_page/payment_web_view_page.dart';
 import 'package:morden_ecommerce_app/pages/user/chekout_page/widgets/Shipping_method.dart';
 import 'package:morden_ecommerce_app/pages/user/chekout_page/widgets/address_widget.dart';
 import 'package:morden_ecommerce_app/pages/user/chekout_page/widgets/order_summary.dart';
@@ -27,7 +28,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   final ValueNotifier<double?> _shippingCost = ValueNotifier(null);
   final ValueNotifier<bool> _loadingShipping = ValueNotifier(false);
   final ValueNotifier<String?> _shippingError = ValueNotifier(null);
-  String? _lastCalculatedKey; 
+  String? _lastCalculatedKey;
   bool _isProcessing = false;
 
   @override
@@ -79,11 +80,30 @@ class _CheckoutPageState extends State<CheckoutPage> {
       final callable = FirebaseFunctions.instance.httpsCallable(
         'initializeTransaction',
       );
+
       final result = await callable.call({
         'shippingCost': _shippingCost.value ?? 0,
         'email': FirebaseAuth.instance.currentUser!.email,
       });
       print('SUCCESS: ${result.data}');
+
+      final reference = await Navigator.push<String>(
+        context,
+
+        MaterialPageRoute(
+          builder: (context) =>
+              PaymentWebViewPage(checkoutUrl: result.data['authorizationUrl']),
+        ),
+      );
+      if (reference == null) {
+        return;
+      }
+      final verify = FirebaseFunctions.instance.httpsCallable(
+        'verifyTransaction',
+      );
+
+      final verifyResult = await verify.call({'reference': reference});
+      print('VERIFY SUCCESS: ${verifyResult.data}');
     } catch (e) {
       print('FUNCTION ERROR: $e');
     }
@@ -102,10 +122,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
     final vatableAmount = subtotalValue + shipping;
     final vat = vatableAmount * 0.075;
 
-    final total =
-        subtotalValue +
-        shipping +
-        vat; 
+    final total = subtotalValue + shipping + vat;
     return Scaffold(
       appBar: AppBar(),
       body: StreamBuilder(
@@ -164,7 +181,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       ).colorScheme.surface.withOpacity(1),
                       spreadRadius: 2,
                       blurRadius: 5,
-                      offset: const Offset(0, -3), 
+                      offset: const Offset(0, -3),
                     ),
                   ],
                 ),

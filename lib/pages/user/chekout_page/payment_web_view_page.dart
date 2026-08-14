@@ -22,8 +22,6 @@ class _PaymentWebViewPageState extends State<PaymentWebViewPage> {
           onNavigationRequest: (request) {
             final url = request.url;
 
-            // This is YOUR callback URL — the one you set (or Paystack's default).
-            // Adjust this check to match whatever callback_url you use.
             if (url.contains('myapp://payment-complete')) {
               final uri = Uri.parse(url);
               final reference = uri.queryParameters['reference'];
