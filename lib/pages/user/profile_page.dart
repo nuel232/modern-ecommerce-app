@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:morden_ecommerce_app/component/my_button.dart';
 import 'package:morden_ecommerce_app/models/user.dart';
+import 'package:morden_ecommerce_app/pages/user/order_history_page.dart';
 import 'package:morden_ecommerce_app/pages/user/settings_page.dart';
 import 'package:morden_ecommerce_app/services/auth/auth_service.dart';
 
@@ -92,19 +93,35 @@ class ProfilePage extends StatelessWidget {
                         children: [
                           ListTile(
                             title: Text('Name'),
+                            leading: const Icon(Icons.person),
                             trailing: Icon(Icons.chevron_right, size: 20),
                           ),
                           SizedBox(height: 10),
 
                           ListTile(
                             title: Text('Email'),
+                            leading: const Icon(Icons.email),
                             trailing: Icon(Icons.chevron_right, size: 20),
                           ),
                           SizedBox(height: 10),
 
                           ListTile(
                             title: Text('phone'),
+                            leading: const Icon(Icons.phone),
                             trailing: Icon(Icons.chevron_right, size: 20),
+                          ),
+                          ListTile(
+                            title: Text('My Orders'),
+                            leading: const Icon(Icons.receipt_long),
+                            trailing: Icon(Icons.chevron_right, size: 20),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => OrderHistoryPage(),
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),

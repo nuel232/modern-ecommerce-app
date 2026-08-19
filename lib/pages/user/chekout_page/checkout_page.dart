@@ -86,6 +86,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
         'email': FirebaseAuth.instance.currentUser!.email,
       });
       print('SUCCESS: ${result.data}');
+      if (!mounted) return;
 
       final reference = await Navigator.push<String>(
         context,
@@ -103,6 +104,49 @@ class _CheckoutPageState extends State<CheckoutPage> {
       );
 
       final verifyResult = await verify.call({'reference': reference});
+      if (!mounted) return;
+
+      if (verifyResult.data['verified'] == true) {
+        final cart = context.read<CartProvider>();
+        final productProvider = context.read<ProductProvider>();
+
+        final items = cart.selectedItems.map((cartItem) {
+          final product = productProvider.getProductById(cartItem.productId);
+          if (product == null) {
+            throw Exception('Product not found: ${cartItem.productId}');
+          }
+          return {
+            'productId': product.productId,
+            'name': product?.name ?? 'Unknown product',
+            'quantity': cartItem.quantity,
+            'price': product.price,
+          };
+        }).toList();
+
+        await FirebaseFirestore.instance.collection('orders').add({
+          'Uid': FirebaseAuth.instance.currentUser!.uid,
+          'items': items,
+          'address': _selectedAddress?.toMap(),
+          'subtotal': cart.getCartTotal(productProvider.products),
+          'Vat': result.data['vat'],
+
+          'shippingCost': _shippingCost.value,
+          'total': result.data['total'],
+          'reference': reference,
+          'status': 'paid',
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+
+        await cart.clearCart();
+        if (!mounted) return;
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Payment successful!')));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Payment verification failed.')),
+        );
+      }
       print('VERIFY SUCCESS: ${verifyResult.data}');
     } catch (e) {
       print('FUNCTION ERROR: $e');
