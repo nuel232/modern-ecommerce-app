@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:morden_ecommerce_app/component/my_button.dart';
 import 'package:morden_ecommerce_app/models/address_model.dart';
@@ -157,32 +158,44 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 children: [
                   Expanded(
                     child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          AddressWidget(
-                            selectedAddress: _selectedAddress,
-                            onChanged: (address) {
-                              setState(() => _selectedAddress = address);
-                              _maybeCalculateShipping();
-                            },
-                          ),
-                          //order summary
-                          OrderSummary(),
+                      child:
+                          Column(
+                                children: [
+                                  AddressWidget(
+                                    selectedAddress: _selectedAddress,
+                                    onChanged: (address) {
+                                      setState(
+                                        () => _selectedAddress = address,
+                                      );
+                                      _maybeCalculateShipping();
+                                    },
+                                  ),
+                                  //order summary
+                                  OrderSummary(),
 
-                          //delivery method
-                          ShippingMethod(
-                            selectedShipping: _selectedShippingMethod,
-                            onChanged: (method) {
-                              setState(() => _selectedShippingMethod = method);
-                              _maybeCalculateShipping();
-                            },
-                          ),
-                          //Promo code
+                                  //delivery method
+                                  ShippingMethod(
+                                    selectedShipping: _selectedShippingMethod,
+                                    onChanged: (method) {
+                                      setState(
+                                        () => _selectedShippingMethod = method,
+                                      );
+                                      _maybeCalculateShipping();
+                                    },
+                                  ),
+                                  //Promo code
 
-                          //payment method
-                          PaymentMethod(),
-                        ],
-                      ),
+                                  //payment method
+                                  PaymentMethod(),
+                                ],
+                              )
+                              .animate()
+                              .fadeIn(
+                                delay: 200.ms,
+                                duration: 600.ms,
+                                curve: Curves.fastEaseInToSlowEaseOut,
+                              )
+                              .moveY(begin: 100),
                     ),
                   ),
 
@@ -205,220 +218,278 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         horizontal: 16.0,
                         vertical: 8.0,
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              showModalBottomSheet(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return StatefulBuilder(
-                                    builder:
-                                        (
-                                          BuildContext context,
-                                          StateSetter setmodalstate,
-                                        ) {
-                                          return SizedBox(
-                                            height: 300,
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(
-                                                8.0,
-                                              ),
-                                              child: Column(
-                                                children: [
-                                                  const Padding(
-                                                    padding: EdgeInsets.all(10),
-                                                    child: Text(
-                                                      "Price Details",
-                                                      style: TextStyle(
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  const Divider(thickness: 0.3),
-                                                  Expanded(
+                      child:
+                          Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      showModalBottomSheet(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return StatefulBuilder(
+                                            builder:
+                                                (
+                                                  BuildContext context,
+                                                  StateSetter setmodalstate,
+                                                ) {
+                                                  return SizedBox(
+                                                    height: 300,
                                                     child: Padding(
                                                       padding:
-                                                          const EdgeInsets.symmetric(
-                                                            horizontal: 8.0,
-                                                            vertical: 8.0,
+                                                          const EdgeInsets.all(
+                                                            8.0,
                                                           ),
                                                       child: Column(
                                                         children: [
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            children: [
-                                                              Text('Subtotal:'),
-                                                              Text(
-                                                                '₦ ${Subtotal}',
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            children: [
-                                                              Text('Shipping:'),
-                                                              ValueListenableBuilder<
-                                                                double?
-                                                              >(
-                                                                valueListenable:
-                                                                    _shippingCost,
-                                                                builder: (context, cost, _) {
-                                                                  return ValueListenableBuilder<
-                                                                    bool
-                                                                  >(
-                                                                    valueListenable:
-                                                                        _loadingShipping,
-                                                                    builder:
-                                                                        (
-                                                                          context,
-                                                                          loading,
-                                                                          _,
-                                                                        ) {
-                                                                          return ValueListenableBuilder<
-                                                                            String?
-                                                                          >(
-                                                                            valueListenable:
-                                                                                _shippingError,
-                                                                            builder:
-                                                                                (
-                                                                                  context,
-                                                                                  error,
-                                                                                  _,
-                                                                                ) {
-                                                                                  return Text(
-                                                                                    loading
-                                                                                        ? 'Calculating...'
-                                                                                        : error !=
-                                                                                              null
-                                                                                        ? error
-                                                                                        : cost !=
-                                                                                              null
-                                                                                        ? '₦ ${cost.toStringAsFixed(0)}'
-                                                                                        : '—',
-                                                                                  );
-                                                                                },
-                                                                          );
-                                                                        },
-                                                                  );
-                                                                },
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            children: [
-                                                              Text('Discount:'),
-                                                              Text('₦'),
-                                                            ], // Update this line
-                                                          ),
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            children: [
-                                                              Text('VAT:'),
-                                                              Text(
-                                                                '- ₦ ${vat.toStringAsFixed(0)}',
-                                                                style: TextStyle(
-                                                                  color: Colors
-                                                                      .red,
+                                                          const Padding(
+                                                            padding:
+                                                                EdgeInsets.all(
+                                                                  10,
                                                                 ),
+                                                            child: Text(
+                                                              "Price Details",
+                                                              style: TextStyle(
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
                                                               ),
-                                                            ], // Update this line
+                                                            ),
+                                                          ),
+                                                          const Divider(
+                                                            thickness: 0.3,
+                                                          ),
+                                                          Expanded(
+                                                            child: Padding(
+                                                              padding:
+                                                                  const EdgeInsets.symmetric(
+                                                                    horizontal:
+                                                                        8.0,
+                                                                    vertical:
+                                                                        8.0,
+                                                                  ),
+                                                              child: Column(
+                                                                children: [
+                                                                  Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .spaceBetween,
+                                                                    children: [
+                                                                      Text(
+                                                                        'Subtotal:',
+                                                                      ),
+                                                                      Text(
+                                                                        '₦ ${Subtotal}',
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                  Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .spaceBetween,
+                                                                    children: [
+                                                                      Text(
+                                                                        'Shipping:',
+                                                                      ),
+                                                                      ValueListenableBuilder<
+                                                                        double?
+                                                                      >(
+                                                                        valueListenable:
+                                                                            _shippingCost,
+                                                                        builder:
+                                                                            (
+                                                                              context,
+                                                                              cost,
+                                                                              _,
+                                                                            ) {
+                                                                              return ValueListenableBuilder<
+                                                                                bool
+                                                                              >(
+                                                                                valueListenable: _loadingShipping,
+                                                                                builder:
+                                                                                    (
+                                                                                      context,
+                                                                                      loading,
+                                                                                      _,
+                                                                                    ) {
+                                                                                      return ValueListenableBuilder<
+                                                                                        String?
+                                                                                      >(
+                                                                                        valueListenable: _shippingError,
+                                                                                        builder:
+                                                                                            (
+                                                                                              context,
+                                                                                              error,
+                                                                                              _,
+                                                                                            ) {
+                                                                                              return Text(
+                                                                                                loading
+                                                                                                    ? 'Calculating...'
+                                                                                                    : error !=
+                                                                                                          null
+                                                                                                    ? error
+                                                                                                    : cost !=
+                                                                                                          null
+                                                                                                    ? '₦ ${cost.toStringAsFixed(0)}'
+                                                                                                    : '—',
+                                                                                              );
+                                                                                            },
+                                                                                      );
+                                                                                    },
+                                                                              );
+                                                                            },
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                  Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .spaceBetween,
+                                                                    children: [
+                                                                      Text(
+                                                                        'Discount:',
+                                                                      ),
+                                                                      Text('₦'),
+                                                                    ], // Update this line
+                                                                  ),
+                                                                  Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .spaceBetween,
+                                                                    children: [
+                                                                      Text(
+                                                                        'VAT:',
+                                                                      ),
+                                                                      Text(
+                                                                        '- ₦ ${vat.toStringAsFixed(0)}',
+                                                                        style: TextStyle(
+                                                                          color:
+                                                                              Colors.red,
+                                                                        ),
+                                                                      ),
+                                                                    ], // Update this line
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
                                                           ),
                                                         ],
                                                       ),
                                                     ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
+                                                  );
+                                                },
                                           );
                                         },
-                                  );
-                                },
-                              );
-                            },
-                            child: Row(
-                              children: [
-                                Text(
-                                  'Total: ',
-                                  style: GoogleFonts.poppins(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                Text(
-                                  '₦${total.toStringAsFixed(0)}',
-                                  style: GoogleFonts.poppins(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.green,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                                SizedBox(width: 3),
-                                Icon(Icons.keyboard_arrow_up_rounded, size: 15),
-                              ],
-                            ),
-                          ),
-
-                          MyButton(
-                            text: 'submit',
-                            padding: EdgeInsets.symmetric(
-                              vertical: 10,
-                              horizontal: 20,
-                            ),
-                            borderRadius: BorderRadius.circular(5),
-                            onTap: _isProcessing
-                                ? null
-                                : () async {
-                                    setState(() => _isProcessing = true);
-                                    try {
-                                      final items = cart.selectedItems.map((
-                                        cartItem,
-                                      ) {
-                                        final product = productProvider
-                                            .getProductById(cartItem.productId);
-                                        return OrderLineItem(
-                                          name: product?.name ?? 'Item',
-                                          quantity: cartItem.quantity,
-                                          price: product?.price ?? 0,
-                                        );
-                                      }).toList();
-
-                                      await _startPayment(
-                                        items: items,
-                                        total: total,
                                       );
-                                    } catch (e) {
-                                      if (!mounted) return;
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            'Payment failed to start: $e',
+                                    },
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          'Total: ',
+                                          style: GoogleFonts.poppins(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
                                           ),
                                         ),
-                                      );
-                                    } finally {
-                                      if (mounted)
-                                        setState(() => _isProcessing = false);
-                                    }
-                                  },
-                          ),
-                        ],
-                      ),
+                                        Text(
+                                          '₦${total.toStringAsFixed(0)}',
+                                          style: GoogleFonts.poppins(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.green,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        SizedBox(width: 3),
+                                        Icon(
+                                          Icons.keyboard_arrow_up_rounded,
+                                          size: 15,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                  MyButton(
+                                    text: 'submit',
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: 10,
+                                      horizontal: 20,
+                                    ),
+                                    borderRadius: BorderRadius.circular(5),
+                                    onTap: _isProcessing
+                                        ? null
+                                        : () async {
+                                            if (_selectedShippingMethod ==
+                                                    null ||
+                                                _shippingCost == null) {
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    'Please select a shipping method.',
+                                                  ),
+                                                ),
+                                              );
+                                              return;
+                                            }
+                                            setState(
+                                              () => _isProcessing = true,
+                                            );
+                                            try {
+                                              final items = cart.selectedItems
+                                                  .map((cartItem) {
+                                                    final product =
+                                                        productProvider
+                                                            .getProductById(
+                                                              cartItem
+                                                                  .productId,
+                                                            );
+                                                    return OrderLineItem(
+                                                      name:
+                                                          product?.name ??
+                                                          'Item',
+                                                      quantity:
+                                                          cartItem.quantity,
+                                                      price:
+                                                          product?.price ?? 0,
+                                                    );
+                                                  })
+                                                  .toList();
+
+                                              await _startPayment(
+                                                items: items,
+                                                total: total,
+                                              );
+                                            } catch (e) {
+                                              if (!mounted) return;
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    'Payment failed to start: $e',
+                                                  ),
+                                                ),
+                                              );
+                                            } finally {
+                                              if (mounted)
+                                                setState(
+                                                  () => _isProcessing = false,
+                                                );
+                                            }
+                                          },
+                                  ),
+                                ],
+                              )
+                              .animate()
+                              .fadeIn(
+                                delay: 200.ms,
+                                duration: 600.ms,
+                                curve: Curves.fastEaseInToSlowEaseOut,
+                              )
+                              .moveY(begin: 100),
                     ),
                   ),
                 ],
