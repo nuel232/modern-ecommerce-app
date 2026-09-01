@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:morden_ecommerce_app/util/formatters.dart';
 
 class OrderHistoryPage extends StatefulWidget {
   const OrderHistoryPage({super.key});
@@ -71,7 +72,7 @@ class _OrderCard extends StatelessWidget {
     final status = (data['status'] as String?) ?? 'unknown';
     final createdAtRaw = data['createdAt'];
 
-    final date = _parseDate(createdAtRaw);
+    final date = parseFirestoreDate(createdAtRaw);
 
     return Container(
       decoration: BoxDecoration(
@@ -106,7 +107,7 @@ class _OrderCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      '#${_shortId(orderId)}',
+                      '#${shortId(orderId)}',
                       style: GoogleFonts.dmSans(
                         fontWeight: FontWeight.w600,
                         fontSize: 13,
@@ -151,7 +152,7 @@ class _OrderCard extends StatelessWidget {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            date != null ? _formatDate(date) : 'Date unknown',
+                            date != null ? formatDate(date) : 'Date unknown',
                             style: GoogleFonts.dmSans(
                               fontSize: 12,
                               color: Colors.grey[500],
@@ -161,7 +162,7 @@ class _OrderCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '₦${_formatMoney(total)}',
+                      '₦${formatMoney(total)}',
                       style: GoogleFonts.poppins(
                         fontWeight: FontWeight.bold,
                         fontSize: 15,
@@ -191,7 +192,7 @@ class _OrderDetailSheet extends StatelessWidget {
     final status = (data['status'] as String?) ?? 'unknown';
     final address = data['address'] as Map<String, dynamic>?;
     final reference = data['reference'] as String?;
-    final date = _parseDate(data['createdAt']);
+    final date = parseFirestoreDate(data['createdAt']);
 
     return SafeArea(
       child: Padding(
@@ -215,7 +216,7 @@ class _OrderDetailSheet extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Order #${_shortId(orderId)}',
+                    'Order #${shortId(orderId)}',
                     style: GoogleFonts.poppins(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -227,7 +228,7 @@ class _OrderDetailSheet extends StatelessWidget {
               if (date != null) ...[
                 const SizedBox(height: 4),
                 Text(
-                  _formatDate(date),
+                  formatDate(date),
                   style: GoogleFonts.dmSans(color: Colors.grey[500]),
                 ),
               ],
@@ -254,7 +255,7 @@ class _OrderDetailSheet extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        '₦${_formatMoney(price * qty)}',
+                        '₦${formatMoney(price * qty)}',
                         style: GoogleFonts.dmSans(fontSize: 14),
                       ),
                     ],
@@ -270,7 +271,7 @@ class _OrderDetailSheet extends StatelessWidget {
                     style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
                   ),
                   Text(
-                    '₦${_formatMoney(total)}',
+                    '₦${formatMoney(total)}',
                     style: GoogleFonts.poppins(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
@@ -420,8 +421,8 @@ class _ErrorState extends StatelessWidget {
 }
 
 // ---- helpers ----
-
-String _shortId(String id) => id.length <= 8 ? id : id.substring(0, 8);
+// formatMoney, formatDate, parseFirestoreDate, and shortId now live in
+// lib/utils/formatters.dart, shared across screens.
 
 String _itemsSummary(List items) {
   if (items.isEmpty) return 'Order';
@@ -429,42 +430,4 @@ String _itemsSummary(List items) {
   final name = first['name'] as String? ?? 'Item';
   if (items.length == 1) return name;
   return '$name +${items.length - 1} more';
-}
-
-String _formatMoney(num value) {
-  final s = value.toStringAsFixed(0);
-  final buffer = StringBuffer();
-  for (int i = 0; i < s.length; i++) {
-    if (i != 0 && (s.length - i) % 3 == 0) buffer.write(',');
-    buffer.write(s[i]);
-  }
-  return buffer.toString();
-}
-
-DateTime? _parseDate(dynamic raw) {
-  if (raw == null) return null;
-  if (raw is Timestamp) return raw.toDate();
-  if (raw is String) return DateTime.tryParse(raw);
-  return null;
-}
-
-String _formatDate(DateTime date) {
-  const months = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ];
-  final hour = date.hour % 12 == 0 ? 12 : date.hour % 12;
-  final minute = date.minute.toString().padLeft(2, '0');
-  final period = date.hour >= 12 ? 'PM' : 'AM';
-  return '${date.day} ${months[date.month - 1]} ${date.year}, $hour:$minute $period';
 }
