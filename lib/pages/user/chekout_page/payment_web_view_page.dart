@@ -11,6 +11,8 @@ class PaymentWebViewPage extends StatefulWidget {
 
 class _PaymentWebViewPageState extends State<PaymentWebViewPage> {
   late final WebViewController _controller;
+  bool _isLoading = true;
+  double _progress = 0;
 
   @override
   void initState() {
@@ -19,10 +21,23 @@ class _PaymentWebViewPageState extends State<PaymentWebViewPage> {
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(
         NavigationDelegate(
+          onPageStarted: (url) {
+            if (!mounted) return;
+            setState(() => _isLoading = true);
+          },
+          onPageFinished: (url) {
+            if (!mounted) return;
+            setState(() => _isLoading = false);
+          },
+          onProgress: (progress) {
+            if (!mounted) return;
+            setState(() => _progress = progress / 100);
+          },
           onNavigationRequest: (request) {
             final url = request.url;
+            print('WEBVIEW NAVIGATING TO: $url');
 
-            if (url.contains('myapp://payment-complete')) {
+            if (url.contains('payment-complete')) {
               final uri = Uri.parse(url);
               final reference = uri.queryParameters['reference'];
 
@@ -46,7 +61,34 @@ class _PaymentWebViewPageState extends State<PaymentWebViewPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Payment')),
-      body: WebViewWidget(controller: _controller),
+      body: Stack(
+        children: [
+          WebViewWidget(controller: _controller),
+          if (_isLoading)
+            Container(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      width: 44,
+                      height: 44,
+                      child: CircularProgressIndicator(
+                        value: _progress > 0 && _progress < 1
+                            ? _progress
+                            : null,
+                        strokeWidth: 3,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text('Loading secure payment page...'),
+                  ],
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

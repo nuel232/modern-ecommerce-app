@@ -18,11 +18,16 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
         stream: FirebaseFirestore.instance
             .collection('orders')
             .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-            .orderBy('orderDate', descending: true)
+            .orderBy('createdAt', descending: true)
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            // Most likely a missing composite index on the first run —
+            // Firestore's error message includes a link to create it.
+            return Center(child: Text('Could not load orders: ${snapshot.error}'));
           }
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             return const Center(child: Text('No orders found.'));
@@ -31,9 +36,12 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
             itemCount: snapshot.data!.docs.length,
             itemBuilder: (context, index) {
               final order = snapshot.data!.docs[index];
+              final data = order.data() as Map<String, dynamic>;
+              final items = (data['items'] as List?) ?? const [];
               return ListTile(
-                title: Text('Order ID: ${order.id}'),
-                subtitle: Text('Total: ${order['total']}'),
+                title: Text('Order #${order.id.substring(0, order.id.length < 8 ? order.id.length : 8)}'),
+                subtitle: Text('${items.length} item(s)'),
+                trailing: Text('₦${(data['totalPrice'] ?? 0).toString()}'),
               );
             },
           );
