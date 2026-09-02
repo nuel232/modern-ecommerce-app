@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:morden_ecommerce_app/services/theme/theme_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -29,7 +30,7 @@ class SettingsPage extends StatelessWidget {
 
             Text(
               'Settings',
-              style: TextStyle(
+              style: GoogleFonts.dmSans(
                 fontSize: 35,
                 color: Theme.of(context).colorScheme.onSurface,
               ),
