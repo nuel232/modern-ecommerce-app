@@ -39,10 +39,8 @@ class _AddressWidgetState extends State<AddressWidget> {
         );
 
         final addresses = user.addresses;
-        // ✅ Declare address as nullable
         AddressModel? address;
 
-        // ✅ Only try to get address if list is not empty
         if (addresses.isNotEmpty) {
           address = addresses.firstWhere(
             (a) => a.isDefault,
