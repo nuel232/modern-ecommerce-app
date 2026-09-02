@@ -243,6 +243,20 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                                           ),
                                                       child: Column(
                                                         children: [
+                                                          Center(
+                                                            child: Container(
+                                                              width: 40,
+                                                              height: 4,
+                                                              decoration: BoxDecoration(
+                                                                color: Colors
+                                                                    .grey[300],
+                                                                borderRadius:
+                                                                    BorderRadius.circular(
+                                                                      2,
+                                                                    ),
+                                                              ),
+                                                            ),
+                                                          ),
                                                           Padding(
                                                             padding:
                                                                 EdgeInsets.all(
