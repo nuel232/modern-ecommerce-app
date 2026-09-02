@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 
 class MyNavBar extends StatelessWidget {
@@ -46,7 +47,7 @@ class MyNavBar extends StatelessWidget {
                 ? Badge(
                     label: Text(
                       cartItemCount! > 99 ? '99+' : '$cartItemCount',
-                      style: TextStyle(
+                      style: GoogleFonts.dmSans(
                         color: Colors.white,
                         fontSize: 7,
                         fontWeight: FontWeight.bold,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:morden_ecommerce_app/models/cart_item.dart';
 import 'package:morden_ecommerce_app/models/product.dart';
 import 'package:morden_ecommerce_app/providers/cart_provider.dart';
@@ -57,14 +58,17 @@ class CartItemsTile extends StatelessWidget {
               children: [
                 Text(
                   product.name,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  style: GoogleFonts.dmSans(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(height: 4),
                 Text(
                   '₦${product.price.toStringAsFixed(2)}',
-                  style: TextStyle(
+                  style: GoogleFonts.dmSans(
                     color: Colors.green,
                     fontWeight: FontWeight.bold,
                   ),
@@ -87,7 +91,10 @@ class CartItemsTile extends StatelessWidget {
                   ),
                   Text(
                     '${cartItem.quantity}',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: GoogleFonts.dmSans(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   IconButton(
                     icon: Icon(Icons.add_circle_outline, size: 20),

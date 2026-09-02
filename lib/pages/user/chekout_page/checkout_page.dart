@@ -243,14 +243,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                                           ),
                                                       child: Column(
                                                         children: [
-                                                          const Padding(
+                                                          Padding(
                                                             padding:
                                                                 EdgeInsets.all(
                                                                   10,
                                                                 ),
                                                             child: Text(
                                                               "Price Details",
-                                                              style: TextStyle(
+                                                              style: GoogleFonts.dmSans(
                                                                 fontSize: 16,
                                                                 fontWeight:
                                                                     FontWeight
@@ -364,7 +364,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                                                       ),
                                                                       Text(
                                                                         '- ₦ ${vat.toStringAsFixed(0)}',
-                                                                        style: TextStyle(
+                                                                        style: GoogleFonts.dmSans(
                                                                           color:
                                                                               Colors.red,
                                                                         ),
@@ -500,7 +500,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
             Positioned.fill(
               child: Container(
                 color: Colors.black.withOpacity(0.45),
-                child: const Center(
+                child: Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -508,7 +508,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       SizedBox(height: 16),
                       Text(
                         'Preparing secure payment...',
-                        style: TextStyle(
+                        style: GoogleFonts.dmSans(
                           color: Colors.white,
                           fontWeight: FontWeight.w600,
                         ),

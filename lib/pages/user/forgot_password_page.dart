@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:morden_ecommerce_app/component/my_button.dart';
 import 'package:morden_ecommerce_app/component/my_textfield.dart';
 import 'package:morden_ecommerce_app/services/auth/auth_service.dart';
@@ -67,7 +68,7 @@ class ForgotPasswordPage extends StatelessWidget {
                     padding: const EdgeInsets.only(top: 50.0),
                     child: Text(
                       'Forgot Password?',
-                      style: TextStyle(
+                      style: GoogleFonts.dmSans(
                         fontSize: 20,
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
@@ -102,7 +103,7 @@ class ForgotPasswordPage extends StatelessWidget {
                     Text('Already have an account? '),
                     Text(
                       'Sign In',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: GoogleFonts.dmSans(fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),

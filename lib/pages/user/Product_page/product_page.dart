@@ -47,7 +47,7 @@ class _ProductPageState extends State<ProductPage> {
                       titlePadding: const EdgeInsets.only(left: 16, bottom: 10),
                       title: Text(
                         'Shop',
-                        style: TextStyle(
+                        style: GoogleFonts.dmSans(
                           color: colorScheme.onPrimary,
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -88,7 +88,7 @@ class _ProductPageState extends State<ProductPage> {
                               const SizedBox(width: 8),
                               Text(
                                 'Hot Picks',
-                                style: TextStyle(
+                                style: GoogleFonts.dmSans(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
                                   color: colorScheme.onPrimary,

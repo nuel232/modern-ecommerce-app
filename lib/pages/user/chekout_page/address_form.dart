@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:morden_ecommerce_app/component/address_form_field.dart';
 import 'package:morden_ecommerce_app/component/my_button.dart';
 import 'package:morden_ecommerce_app/models/address_model.dart';
@@ -162,7 +163,7 @@ class _AddressFormState extends State<AddressForm> {
                           padding: const EdgeInsets.only(right: 4, top: 7),
                           child: Text(
                             "+234 |",
-                            style: TextStyle(color: Colors.grey),
+                            style: GoogleFonts.dmSans(color: Colors.grey),
                           ),
                         ),
                       ),

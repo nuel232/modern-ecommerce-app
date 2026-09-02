@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:morden_ecommerce_app/component/admin_popover.dart';
 import 'package:popover/popover.dart';
 
@@ -65,7 +66,7 @@ class AdminProductTile extends StatelessWidget {
               ),
         title: Text(
           name,
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+          style: GoogleFonts.dmSans(fontWeight: FontWeight.bold, fontSize: 17),
         ),
         subtitle: Padding(
           padding: EdgeInsets.only(top: 8),
@@ -78,7 +79,7 @@ class AdminProductTile extends StatelessWidget {
               Icon(Icons.attach_money, size: 16, color: Colors.green),
               Text(
                 '${price.toStringAsFixed(2)}',
-                style: TextStyle(
+                style: GoogleFonts.dmSans(
                   color: Colors.green,
                   fontWeight: FontWeight.bold,
                 ),

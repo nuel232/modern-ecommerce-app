@@ -33,6 +33,7 @@ migrate_working_dir/
 /build/
 /coverage/
 node_modules/
+.patch
 
 # Symbolication related
 app.*.symbols

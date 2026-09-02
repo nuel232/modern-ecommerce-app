@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AdminPopover extends StatelessWidget {
   final void Function()? onDeleteTap;
@@ -27,7 +28,7 @@ class AdminPopover extends StatelessWidget {
             child: Center(
               child: Text(
                 'Edit',
-                style: TextStyle(
+                style: GoogleFonts.dmSans(
                   color: Theme.of(context).colorScheme.inversePrimary,
                   fontWeight: FontWeight.bold,
                 ),
@@ -49,7 +50,7 @@ class AdminPopover extends StatelessWidget {
             child: Center(
               child: Text(
                 'delete',
-                style: TextStyle(
+                style: GoogleFonts.dmSans(
                   color: Colors.red,
                   fontWeight: FontWeight.bold,
                 ),

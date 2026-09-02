@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class SearchBarDelegate extends SliverPersistentHeaderDelegate {
   final ColorScheme colorScheme;
@@ -41,7 +42,7 @@ class SearchBarDelegate extends SliverPersistentHeaderDelegate {
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   hintText: 'Search...',
-                  hintStyle: TextStyle(color: colorScheme.onPrimary),
+                  hintStyle: GoogleFonts.dmSans(color: colorScheme.onPrimary),
                   prefixIcon: Icon(Icons.search, size: 20),
                   contentPadding: EdgeInsets.symmetric(
                     horizontal: 16,

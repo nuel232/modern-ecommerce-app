@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:morden_ecommerce_app/component/my_button.dart';
 import 'package:morden_ecommerce_app/component/my_textfield.dart';
 import 'package:morden_ecommerce_app/services/auth/auth_service.dart';
@@ -94,7 +95,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 //text
                 Text(
                   'Welcome, You made the right choice',
-                  style: TextStyle(
+                  style: GoogleFonts.dmSans(
                     color: Theme.of(context).colorScheme.onSurface,
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
@@ -158,7 +159,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   children: [
                     Text(
                       "Already have an account?",
-                      style: TextStyle(
+                      style: GoogleFonts.dmSans(
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
@@ -166,7 +167,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       onTap: widget.onTap,
                       child: Text(
                         'Login',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        style: GoogleFonts.dmSans(fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],

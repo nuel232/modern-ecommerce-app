@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:morden_ecommerce_app/component/admin_product_tile.dart';
 import 'package:morden_ecommerce_app/services/auth/auth_service.dart';
 import 'package:morden_ecommerce_app/models/shop.dart';
@@ -84,7 +85,7 @@ class _DashboardPageState extends State<DashboardPage> {
             onPressed: () => Navigator.pop(context),
             child: Text(
               'Cancel',
-              style: TextStyle(
+              style: GoogleFonts.dmSans(
                 color: Theme.of(context).colorScheme.onSecondary,
               ),
             ),
@@ -105,7 +106,7 @@ class _DashboardPageState extends State<DashboardPage> {
             },
             child: Text(
               'Save Changes',
-              style: TextStyle(
+              style: GoogleFonts.dmSans(
                 color: Theme.of(context).colorScheme.onSecondary,
               ),
             ),
@@ -144,7 +145,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   SizedBox(height: 20),
                   Text(
                     'No products yet!',
-                    style: TextStyle(
+                    style: GoogleFonts.dmSans(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: Theme.of(context).colorScheme.inversePrimary,
@@ -154,7 +155,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   Text(
                     'Tap the + button below to add your first product',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: GoogleFonts.dmSans(
                       fontSize: 16,
                       color: Theme.of(context).colorScheme.onSurface,
                     ),
@@ -190,7 +191,7 @@ class _DashboardPageState extends State<DashboardPage> {
                             onPressed: () => Navigator.pop(context),
                             child: Text(
                               'Cancel',
-                              style: TextStyle(
+                              style: GoogleFonts.dmSans(
                                 color: Theme.of(
                                   context,
                                 ).colorScheme.onSecondary,
@@ -205,7 +206,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                 SnackBar(
                                   content: Text(
                                     '${product.name} deleted',
-                                    style: TextStyle(
+                                    style: GoogleFonts.dmSans(
                                       color: Theme.of(
                                         context,
                                       ).colorScheme.onSecondary,
@@ -218,7 +219,7 @@ class _DashboardPageState extends State<DashboardPage> {
                             },
                             child: Text(
                               'Delete',
-                              style: TextStyle(color: Colors.red),
+                              style: GoogleFonts.dmSans(color: Colors.red),
                             ),
                           ),
                         ],

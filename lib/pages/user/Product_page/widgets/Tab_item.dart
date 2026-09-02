@@ -1,6 +1,7 @@
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class TabItem extends StatelessWidget {
   final String title;
@@ -15,7 +16,7 @@ class TabItem extends StatelessWidget {
           Text(
             title,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
+            style: GoogleFonts.dmSans(
               color: Theme.of(context).colorScheme.inverseSurface,
             ),
           ),

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:morden_ecommerce_app/component/my_button.dart';
 import 'package:morden_ecommerce_app/models/user.dart';
 import 'package:morden_ecommerce_app/pages/user/order_history_page.dart';
@@ -78,7 +79,7 @@ class ProfilePage extends StatelessWidget {
 
                     Text(
                       user.name.isNotEmpty ? user.name : 'Guest User',
-                      style: TextStyle(fontSize: 35),
+                      style: GoogleFonts.dmSans(fontSize: 35),
                     ),
 
                     SizedBox(height: 10),
