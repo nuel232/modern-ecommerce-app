@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:morden_ecommerce_app/component/cart_items_tile.dart';
 import 'package:morden_ecommerce_app/component/my_button.dart';
 import 'package:morden_ecommerce_app/pages/user/chekout_page/checkout_page.dart';
@@ -20,7 +21,13 @@ class CartPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Cart'),
+        title: Text(
+          'Cart (${cartItems.length})',
+          style: GoogleFonts.dmSans(
+            color: Theme.of(context).colorScheme.onPrimary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         actions: [
           if (cartItems.isNotEmpty)
             TextButton(
@@ -28,17 +35,31 @@ class CartPage extends StatelessWidget {
                 showDialog(
                   context: context,
                   builder: (context) => AlertDialog(
-                    title: Text('Clear Cart?'),
-                    content: Text('Are you sure you want to remove all items?'),
+                    title: Text(
+                      'Clear Cart?',
+                      style: GoogleFonts.dmSans(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red,
+                      ),
+                    ),
+                    content: Text(
+                      'Are you sure you want to remove all items?',
+                      style: GoogleFonts.dmSans(),
+                    ),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(context),
-                        child: Text('Cancel'),
+                        child: Text(
+                          'Cancel',
+                          style: GoogleFonts.dmSans(
+                            color: Theme.of(context).colorScheme.onPrimary,
+                          ),
+                        ),
                       ),
                       Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(15),
-                          color: Theme.of(context).colorScheme.secondary,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
                         child: TextButton(
                           onPressed: () {
@@ -47,7 +68,10 @@ class CartPage extends StatelessWidget {
                           },
                           child: Text(
                             'Clear',
-                            style: TextStyle(color: Colors.red),
+                            style: GoogleFonts.dmSans(
+                              color: Colors.red,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
@@ -63,8 +87,8 @@ class CartPage extends StatelessWidget {
                 ),
                 child: Text(
                   'Clear',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSecondary,
+                  style: GoogleFonts.dmSans(
+                    color: Theme.of(context).colorScheme.onPrimary,
                   ),
                 ),
               ),
@@ -86,7 +110,10 @@ class CartPage extends StatelessWidget {
                   SizedBox(height: 20),
                   Text(
                     'Your cart is empty',
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                    style: GoogleFonts.dmSans(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   SizedBox(height: 10),
                   Text('Add items to get started'),
@@ -136,7 +163,7 @@ class CartPage extends StatelessWidget {
                               ),
                               Text(
                                 'Select All',
-                                style: TextStyle(
+                                style: GoogleFonts.dmSans(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -145,11 +172,11 @@ class CartPage extends StatelessWidget {
                               Flexible(
                                 child: Text(
                                   '${cart.selectedCount()} / ${cartItems.length} selected',
-                                  style: TextStyle(
+                                  style: GoogleFonts.dmSans(
                                     fontSize: 14,
                                     color: Theme.of(
                                       context,
-                                    ).colorScheme.onSecondary.withOpacity(0.6),
+                                    ).colorScheme.onPrimary.withOpacity(0.6),
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                 ),

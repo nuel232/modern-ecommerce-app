@@ -89,41 +89,48 @@ class ProfilePage extends StatelessWidget {
                         color: Theme.of(context).colorScheme.primary,
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Column(
-                        children: [
-                          ListTile(
-                            title: Text('Name'),
-                            leading: const Icon(Icons.person),
-                            trailing: Icon(Icons.chevron_right, size: 20),
-                          ),
-                          SizedBox(height: 10),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(16),
 
-                          ListTile(
-                            title: Text('Email'),
-                            leading: const Icon(Icons.email),
-                            trailing: Icon(Icons.chevron_right, size: 20),
-                          ),
-                          SizedBox(height: 10),
+                          child: Column(
+                            children: [
+                              ListTile(
+                                title: Text('Name'),
+                                leading: const Icon(Icons.person),
+                                trailing: Icon(Icons.chevron_right, size: 20),
+                              ),
+                              SizedBox(height: 10),
 
-                          ListTile(
-                            title: Text('phone'),
-                            leading: const Icon(Icons.phone),
-                            trailing: Icon(Icons.chevron_right, size: 20),
+                              ListTile(
+                                title: Text('Email'),
+                                leading: const Icon(Icons.email),
+                                trailing: Icon(Icons.chevron_right, size: 20),
+                              ),
+                              SizedBox(height: 10),
+
+                              ListTile(
+                                title: Text('phone'),
+                                leading: const Icon(Icons.phone),
+                                trailing: Icon(Icons.chevron_right, size: 20),
+                              ),
+                              ListTile(
+                                title: Text('My Orders'),
+                                leading: const Icon(Icons.receipt_long),
+                                trailing: Icon(Icons.chevron_right, size: 20),
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => OrderHistoryPage(),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
                           ),
-                          ListTile(
-                            title: Text('My Orders'),
-                            leading: const Icon(Icons.receipt_long),
-                            trailing: Icon(Icons.chevron_right, size: 20),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => OrderHistoryPage(),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
+                        ),
                       ),
                     ),
                   ],

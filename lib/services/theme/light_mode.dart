@@ -6,13 +6,13 @@ ThemeData lightMode = ThemeData(
     primary: Colors.grey.shade100,
     tertiary: const Color.fromARGB(255, 78, 88, 103),
     secondary: const Color.fromARGB(255, 54, 59, 81),
-    onSecondary: Colors.black, // ← CHANGE to pure black
-    onPrimary: Colors.black, // ← CHANGE to pure black
-    onSurface: Colors.black, // ← CHANGE to pure black
+    onSecondary: Colors.grey.shade100,
+    onPrimary: Colors.grey.shade900,
+    onSurface: Colors.grey.shade900,
   ),
 
   textTheme: ThemeData.light().textTheme.apply(
-    bodyColor: Colors.black,
-    displayColor: Colors.black,
+    bodyColor: Colors.grey.shade900,
+    displayColor: Colors.grey.shade900,
   ),
 );

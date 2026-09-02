@@ -119,7 +119,7 @@ class _ProductPageState extends State<ProductPage> {
                             .animate(target: 1)
                             .moveX(
                               begin: 1000,
-                              delay: 400.ms,
+                              delay: 200.ms,
                               duration: 600.ms,
                               curve: Curves.fastLinearToSlowEaseIn,
                             ),
@@ -188,7 +188,7 @@ class _ProductPageState extends State<ProductPage> {
               )
               .animate()
               .fadeIn(
-                delay: 300.ms,
+                delay: 200.ms,
                 duration: 600.ms,
                 curve: Curves.fastEaseInToSlowEaseOut,
               )

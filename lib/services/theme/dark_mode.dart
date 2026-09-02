@@ -8,12 +8,12 @@ ThemeData darkMode = ThemeData(
     tertiary: Colors.white,
     secondary: Color.fromARGB(255, 32, 39, 49),
     onSecondary: Colors.white,
-    onPrimary: Colors.white, // ← CHANGE to pure white
-    onSurface: Colors.white, // ← CHANGE to pure white
+    onPrimary: Colors.grey.shade100,
+    onSurface: Colors.grey.shade100,
     inverseSurface: Color.fromARGB(255, 217, 221, 226),
   ),
   textTheme: ThemeData.dark().textTheme.apply(
-    bodyColor: Colors.white,
-    displayColor: Colors.white,
+    bodyColor: Colors.grey.shade100,
+    displayColor: Colors.grey.shade100,
   ),
 );
