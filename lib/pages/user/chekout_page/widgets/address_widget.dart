@@ -60,7 +60,6 @@ class _AddressWidgetState extends State<AddressWidget> {
           children: [
             //users address
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
               margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
@@ -69,40 +68,10 @@ class _AddressWidgetState extends State<AddressWidget> {
                     : Border.all(color: Theme.of(context).colorScheme.primary),
                 color: Theme.of(context).colorScheme.primary,
               ),
-
-              child: ListTile(
-                title: Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: Text(
-                    'Shipping Address',
-                    style: GoogleFonts.dmSans(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-
-                subtitle: addresses.isEmpty
-                    ? Text(
-                        'please input your address',
-                        style: GoogleFonts.dmSans(
-                          color: Colors.red,
-                          fontSize: 15,
-                        ),
-                      )
-                    : Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Contact: ${address!.email}'),
-                          Text('name: ${address.fullName}'),
-                          Text('phone: ${address.phoneNumber}'),
-                          Text(
-                            'Ship to:  ${address.streetAddress}, ${address.city}, ${address.state} ',
-                          ),
-                        ],
-                      ),
-                trailing: GestureDetector(
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(15),
                   onTap: () async {
                     if (addresses.isEmpty) {
                       // CREATE — no existing address
@@ -125,6 +94,7 @@ class _AddressWidgetState extends State<AddressWidget> {
                     } else {
                       showModalBottomSheet(
                         context: context,
+                        // isScrollControlled: true,
                         builder: (context) => AddressList(),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.vertical(
@@ -134,7 +104,89 @@ class _AddressWidgetState extends State<AddressWidget> {
                       );
                     }
                   },
-                  child: Icon(Icons.arrow_forward_ios_rounded, size: 15),
+                  child: Padding(
+                    padding: const EdgeInsets.all(14),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          addresses.isEmpty
+                              ? Icons.add_location_alt_outlined
+                              : Icons.location_on_outlined,
+                          size: 22,
+                          color: addresses.isEmpty
+                              ? Colors.red
+                              : Theme.of(
+                                  context,
+                                ).colorScheme.onPrimary.withOpacity(0.7),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Shipping Address',
+                                style: GoogleFonts.dmSans(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              if (addresses.isEmpty)
+                                Text(
+                                  'Add a shipping address to continue',
+                                  style: GoogleFonts.dmSans(
+                                    color: Colors.red,
+                                    fontSize: 13,
+                                  ),
+                                )
+                              else ...[
+                                Text(
+                                  address!.fullName,
+                                  style: GoogleFonts.dmSans(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '${address.streetAddress}, ${address.city}, ${address.state}',
+                                  style: GoogleFonts.dmSans(
+                                    fontSize: 13,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onPrimary.withOpacity(0.7),
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  address.phoneNumber,
+                                  style: GoogleFonts.dmSans(
+                                    fontSize: 13,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onPrimary.withOpacity(0.7),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            size: 15,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onPrimary.withOpacity(0.5),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),

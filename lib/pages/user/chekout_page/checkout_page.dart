@@ -29,6 +29,7 @@ class CheckoutPage extends StatefulWidget {
 class _CheckoutPageState extends State<CheckoutPage> {
   Method? _selectedShippingMethod;
   AddressModel? _selectedAddress;
+  PaymentChannel? _selectedPayment;
   final ValueNotifier<double?> _shippingCost = ValueNotifier(null);
   final ValueNotifier<bool> _loadingShipping = ValueNotifier(false);
   final ValueNotifier<String?> _shippingError = ValueNotifier(null);
@@ -82,9 +83,20 @@ class _CheckoutPageState extends State<CheckoutPage> {
       'initializeTransaction',
     );
 
+    // Paystack's own channel names — restricting to the one the customer
+    // picked skips the "choose how to pay" step on their hosted page,
+    // rather than showing every channel every time.
+    final channels = switch (_selectedPayment) {
+      PaymentChannel.card => ['card'],
+      PaymentChannel.bankTransfer => ['bank_transfer'],
+      null => null,
+    };
+
     final result = await callable.call({
       'shippingCost': _shippingCost.value ?? 0,
       'email': FirebaseAuth.instance.currentUser!.email,
+      'address': _selectedAddress?.toMap(),
+      'channels': channels,
     });
 
     if (!mounted) return;
@@ -203,7 +215,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                   //Promo code
 
                                   //payment method
-                                  PaymentMethod(),
+                                  PaymentMethod(
+                                    selectedPayment: _selectedPayment,
+                                    onChanged: (method) {
+                                      setState(() => _selectedPayment = method);
+                                    },
+                                  ),
                                 ],
                               )
                               .animate()
@@ -313,6 +330,19 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                             const SnackBar(
                                               content: Text(
                                                 'Please select a shipping method to continue.',
+                                              ),
+                                            ),
+                                          );
+                                          return;
+                                        }
+
+                                        if (_selectedPayment == null) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                'Please select a payment method to continue.',
                                               ),
                                             ),
                                           );

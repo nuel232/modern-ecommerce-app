@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:morden_ecommerce_app/pages/user/chekout_page/widgets/Shipping_method.dart';
 
-class PaymentMethod extends StatefulWidget {
-  const PaymentMethod({super.key});
+/// Which Paystack channel to restrict checkout to. Kept separate from the
+/// shipping Method enum — payment method and shipping method are unrelated
+/// choices and shouldn't share a type.
+enum PaymentChannel { card, bankTransfer }
 
-  @override
-  State<PaymentMethod> createState() => _PaymentMethodState();
-}
+class PaymentMethod extends StatelessWidget {
+  final PaymentChannel? selectedPayment;
+  final ValueChanged<PaymentChannel?> onChanged;
 
-class _PaymentMethodState extends State<PaymentMethod> {
-  Method? _selectedPayment;
+  const PaymentMethod({
+    super.key,
+    required this.selectedPayment,
+    required this.onChanged,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -47,11 +52,9 @@ class _PaymentMethodState extends State<PaymentMethod> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(4),
               ),
-              value: _selectedPayment == Method.standard,
+              value: selectedPayment == PaymentChannel.card,
               onChanged: (value) {
-                setState(() {
-                  _selectedPayment = value == true ? Method.standard : null;
-                });
+                onChanged(value == true ? PaymentChannel.card : null);
               },
             ),
           ),
@@ -63,11 +66,9 @@ class _PaymentMethodState extends State<PaymentMethod> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(4),
               ),
-              value: _selectedPayment == Method.express,
+              value: selectedPayment == PaymentChannel.bankTransfer,
               onChanged: (value) {
-                setState(() {
-                  _selectedPayment = value == true ? Method.express : null;
-                });
+                onChanged(value == true ? PaymentChannel.bankTransfer : null);
               },
             ),
           ),

@@ -1,8 +1,9 @@
-const {onCall, HttpsError} = require("firebase-functions/v2/https");
+const {onCall, onRequest, HttpsError} = require("firebase-functions/v2/https");
 const {defineSecret} = require("firebase-functions/params");
 const {initializeApp} = require("firebase-admin/app");
 const {getFirestore} = require("firebase-admin/firestore");
 const fetch = require("node-fetch");
+const crypto = require("crypto");
 
 initializeApp();
 const db = getFirestore();
@@ -74,7 +75,7 @@ exports.initializeTransaction = onCall(
       }
 
       const uid = request.auth.uid;
-      const {shippingCost, email} = request.data;
+      const {shippingCost, email, address, channels} = request.data;
 
       if (typeof shippingCost !== "number" || shippingCost < 0) {
         throw new HttpsError("invalid-argument", "Invalid shipping cost");
@@ -83,12 +84,44 @@ exports.initializeTransaction = onCall(
         throw new HttpsError("invalid-argument", "Email is required");
       }
 
+      // Whitelist channels rather than passing the client's array straight
+      // through — this field goes directly into the Paystack request body,
+      // so an unvalidated value here is an injection point.
+      const allowedChannels = ["card", "bank_transfer"];
+      let paystackChannels;
+      if (channels !== undefined && channels !== null) {
+        if (
+          !Array.isArray(channels) ||
+          channels.length === 0 ||
+          !channels.every((c) => allowedChannels.includes(c))
+        ) {
+          throw new HttpsError("invalid-argument", "Invalid payment channel");
+        }
+        paystackChannels = channels;
+      }
+
       const {subtotal, vat, total} = await computeOrderAmount(
           uid,
           shippingCost,
       );
 
       const amountInKobo = Math.round(total * 100);
+
+      // Paystack generates the reference for us, but we need somewhere to
+      // stash the shipping address *before* the payment starts, keyed to
+      // that reference — neither the webhook nor a client that comes back
+      // after losing connection can be trusted to supply it later.
+      // Paystack lets us request a reference upfront by passing our own,
+      // so we mint one here instead of waiting for their response.
+      const reference = `${uid}_${Date.now()}_${
+        crypto.randomBytes(4).toString("hex")
+      }`;
+
+      await db.collection("pendingOrders").doc(reference).set({
+        uid,
+        address: address || null,
+        createdAt: new Date().toISOString(),
+      });
 
       const response = await fetch(
           "https://api.paystack.co/transaction/initialize",
@@ -99,10 +132,11 @@ exports.initializeTransaction = onCall(
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-
               email,
               amount: amountInKobo,
+              reference,
               metadata: {uid},
+              ...(paystackChannels ? {channels: paystackChannels} : {}),
               callback_url: "https://ecommerce-app-4f158.web.app/payment-complete",
             }),
           },
@@ -111,6 +145,9 @@ exports.initializeTransaction = onCall(
       const data = await response.json();
 
       if (!data.status) {
+        // Initialization failed — clean up the pending doc we just wrote
+        // so it doesn't linger with no matching transaction.
+        await db.collection("pendingOrders").doc(reference).delete();
         throw new HttpsError(
             "internal",
             `Paystack error: ${data.message || "unknown error"}`,
@@ -141,20 +178,28 @@ exports.initializeTransaction = onCall(
  * @param {string} uid User ID
  * @param {string} reference Paystack transaction reference
  * @param {number} amountPaid Amount actually paid (in Naira), from Paystack
- * @param {Object|null} address Shipping address, snapshotted from the
- *   client at checkout time (so later edits to the saved address don't
- *   retroactively change this order's shipping destination).
  * @return {Promise<string|null>} The order ID, or null if already processed
  */
-async function fulfillOrder(uid, reference, amountPaid, address) {
+async function fulfillOrder(uid, reference, amountPaid) {
   const orderRef = db.collection("orders").doc(reference);
+  const pendingRef = db.collection("pendingOrders").doc(reference);
 
   return db.runTransaction(async (tx) => {
     const existingOrder = await tx.get(orderRef);
     if (existingOrder.exists) {
-      // Already fulfilled by a previous verify call — don't double-process.
+      // Already fulfilled — either the webhook and the client's verify
+      // call raced, or verify was retried. Don't double-process.
       return null;
     }
+
+    // Shipping address was snapshotted server-side at initializeTransaction
+    // time, before payment started, so this works whether fulfillment is
+    // triggered by the client (verifyTransaction) or by Paystack's webhook
+    // with no client involved at all.
+    const pendingSnap = await tx.get(pendingRef);
+    const address = pendingSnap.exists ?
+      (pendingSnap.data().address || null) :
+      null;
 
     const cartSnap = await tx.get(
         db.collection("users")
@@ -175,6 +220,7 @@ async function fulfillOrder(uid, reference, amountPaid, address) {
         status: "paid",
         createdAt: new Date().toISOString(),
       });
+      tx.delete(pendingRef);
       return orderRef.id;
     }
 
@@ -237,6 +283,7 @@ async function fulfillOrder(uid, reference, amountPaid, address) {
     });
 
     cartSnap.docs.forEach((doc) => tx.delete(doc.ref));
+    tx.delete(pendingRef);
 
     return orderRef.id;
   });
@@ -250,7 +297,7 @@ exports.verifyTransaction = onCall(
       }
 
       const uid = request.auth.uid;
-      const {reference, address} = request.data;
+      const {reference} = request.data;
       if (!reference) {
         throw new HttpsError("invalid-argument", "Reference is required");
       }
@@ -270,7 +317,7 @@ exports.verifyTransaction = onCall(
         throw new HttpsError(
             "internal",
             `Paystack error: ${data.message || "unknown error"}`,
-        );  
+        );
       }
 
       // Paystack transaction statuses: success | abandoned | failed | pending
@@ -288,7 +335,7 @@ exports.verifyTransaction = onCall(
 
       let orderId;
       try {
-        orderId = await fulfillOrder(uid, reference, amountPaid, address);
+        orderId = await fulfillOrder(uid, reference, amountPaid);
       } catch (err) {
         // Payment succeeded but fulfillment failed (most likely stock ran
         // out between initialize and now). Don't throw — the client needs
@@ -311,5 +358,68 @@ exports.verifyTransaction = onCall(
         reference: data.data.reference,
         orderId: orderId || reference,
       };
+    },
+);
+
+/**
+ * Server-to-server webhook. Register this URL in the Paystack dashboard
+ * under Settings > API Keys & Webhooks. Paystack calls this directly on
+ * charge.success, independent of the app — so an order still gets
+ * fulfilled and stock still decrements even if the customer's connection
+ * drops or the app is killed right after paying.
+ *
+ * fulfillOrder is idempotent (keyed by reference), so it's safe for this
+ * and verifyTransaction to both fire for the same payment — whichever
+ * runs first does the work, the other is a no-op.
+ */
+exports.paystackWebhook = onRequest(
+    {secrets: [paystackSecretKey]},
+    async (req, res) => {
+      if (req.method !== "POST") {
+        res.status(405).send("Method not allowed");
+        return;
+      }
+
+      // Verify this request actually came from Paystack before trusting
+      // anything in the body — without this, anyone who finds this URL
+      // could fabricate a "payment successful" event and get free orders.
+      const signature = req.headers["x-paystack-signature"];
+      const expectedHash = crypto
+          .createHmac("sha512", paystackSecretKey.value())
+          .update(req.rawBody)
+          .digest("hex");
+
+      if (!signature || signature !== expectedHash) {
+        res.status(401).send("Invalid signature");
+        return;
+      }
+
+      const event = req.body;
+
+      if (event.event === "charge.success") {
+        const {reference, amount, metadata} = event.data;
+        const uid = metadata && metadata.uid;
+
+        if (!uid) {
+          console.error(`Webhook: no uid in metadata for ${reference}`);
+        } else {
+          try {
+            await fulfillOrder(uid, reference, amount / 100);
+          } catch (err) {
+            // Same "paid but couldn't fulfill" case as verifyTransaction —
+            // most likely stock ran out. Nothing to return to a webhook
+            // caller, so just log it for manual follow-up (refund/restock).
+            console.error(
+                `Webhook fulfillment failed for ${reference}:`,
+                err.message || err,
+            );
+          }
+        }
+      }
+
+      // Always 200 once the signature checks out, even if fulfillment
+      // logged an error above — a non-200 makes Paystack retry the same
+      // event repeatedly, which won't fix a stock-out.
+      res.status(200).send("ok");
     },
 );
