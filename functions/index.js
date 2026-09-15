@@ -2,11 +2,28 @@ const {onCall, onRequest, HttpsError} = require("firebase-functions/v2/https");
 const {defineSecret} = require("firebase-functions/params");
 const {initializeApp} = require("firebase-admin/app");
 const {getFirestore} = require("firebase-admin/firestore");
-const fetch = require("node-fetch");
+const nodeFetch = require("node-fetch");
 const crypto = require("crypto");
 
-initializeApp();
-const db = getFirestore();
+// Injectable seams for testing. Production code paths are unchanged —
+// these just default to the real Firestore/fetch when not overridden.
+let db;
+let fetch = nodeFetch;
+
+/**
+ * Test-only hook: lets unit tests swap in fakes for Firestore and fetch
+ * without touching the real Firebase Admin SDK or network.
+ * @param {Object} overrides Object with optional db/fetch fakes.
+ */
+function __setTestDeps({db: fakeDb, fetch: fakeFetch} = {}) {
+  if (fakeDb) db = fakeDb;
+  if (fakeFetch) fetch = fakeFetch;
+}
+
+if (process.env.NODE_ENV !== "test") {
+  initializeApp();
+  db = getFirestore();
+}
 
 const paystackSecretKey = defineSecret("PAYSTACK_SECRET_KEY");
 
@@ -372,54 +389,76 @@ exports.verifyTransaction = onCall(
  * and verifyTransaction to both fire for the same payment — whichever
  * runs first does the work, the other is a no-op.
  */
+/**
+ * Pure webhook handler logic, decoupled from the onRequest wrapper and
+ * secret-manager plumbing so it can be unit tested with a fake req/res
+ * and a plain string secret.
+ * @param {Object} req Express-like request (method, headers, rawBody, body)
+ * @param {Object} res Express-like response (status().send())
+ * @param {string} secretValue The Paystack secret key value to verify with
+ * @return {Promise<void>}
+ */
+async function handlePaystackWebhook(req, res, secretValue) {
+  if (req.method !== "POST") {
+    res.status(405).send("Method not allowed");
+    return;
+  }
+
+  // Verify this request actually came from Paystack before trusting
+  // anything in the body — without this, anyone who finds this URL
+  // could fabricate a "payment successful" event and get free orders.
+  const signature = req.headers["x-paystack-signature"];
+  const expectedHash = crypto
+      .createHmac("sha512", secretValue)
+      .update(req.rawBody)
+      .digest("hex");
+
+  if (!signature || signature !== expectedHash) {
+    res.status(401).send("Invalid signature");
+    return;
+  }
+
+  const event = req.body;
+
+  if (event.event === "charge.success") {
+    const {reference, amount, metadata} = event.data;
+    const uid = metadata && metadata.uid;
+
+    if (!uid) {
+      console.error(`Webhook: no uid in metadata for ${reference}`);
+    } else {
+      try {
+        await fulfillOrder(uid, reference, amount / 100);
+      } catch (err) {
+        // Same "paid but couldn't fulfill" case as verifyTransaction —
+        // most likely stock ran out. Nothing to return to a webhook
+        // caller, so just log it for manual follow-up (refund/restock).
+        console.error(
+            `Webhook fulfillment failed for ${reference}:`,
+            err.message || err,
+        );
+      }
+    }
+  }
+
+  // Always 200 once the signature checks out, even if fulfillment
+  // logged an error above — a non-200 makes Paystack retry the same
+  // event repeatedly, which won't fix a stock-out.
+  res.status(200).send("ok");
+}
+
+// Exported for unit testing only — not part of the public Cloud Functions
+// surface (those are the onCall/onRequest exports below).
+exports.__testables = {
+  computeOrderAmount,
+  fulfillOrder,
+  handlePaystackWebhook,
+  __setTestDeps,
+};
+
 exports.paystackWebhook = onRequest(
     {secrets: [paystackSecretKey]},
     async (req, res) => {
-      if (req.method !== "POST") {
-        res.status(405).send("Method not allowed");
-        return;
-      }
-
-      // Verify this request actually came from Paystack before trusting
-      // anything in the body — without this, anyone who finds this URL
-      // could fabricate a "payment successful" event and get free orders.
-      const signature = req.headers["x-paystack-signature"];
-      const expectedHash = crypto
-          .createHmac("sha512", paystackSecretKey.value())
-          .update(req.rawBody)
-          .digest("hex");
-
-      if (!signature || signature !== expectedHash) {
-        res.status(401).send("Invalid signature");
-        return;
-      }
-
-      const event = req.body;
-
-      if (event.event === "charge.success") {
-        const {reference, amount, metadata} = event.data;
-        const uid = metadata && metadata.uid;
-
-        if (!uid) {
-          console.error(`Webhook: no uid in metadata for ${reference}`);
-        } else {
-          try {
-            await fulfillOrder(uid, reference, amount / 100);
-          } catch (err) {
-            // Same "paid but couldn't fulfill" case as verifyTransaction —
-            // most likely stock ran out. Nothing to return to a webhook
-            // caller, so just log it for manual follow-up (refund/restock).
-            console.error(
-                `Webhook fulfillment failed for ${reference}:`,
-                err.message || err,
-            );
-          }
-        }
-      }
-
-      // Always 200 once the signature checks out, even if fulfillment
-      // logged an error above — a non-200 makes Paystack retry the same
-      // event repeatedly, which won't fix a stock-out.
-      res.status(200).send("ok");
+      await handlePaystackWebhook(req, res, paystackSecretKey.value());
     },
 );

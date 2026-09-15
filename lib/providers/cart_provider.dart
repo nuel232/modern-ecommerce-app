@@ -5,7 +5,10 @@ import 'package:morden_ecommerce_app/models/product.dart';
 import 'package:morden_ecommerce_app/services/shop/cart_service.dart';
 
 class CartProvider extends ChangeNotifier {
-  final CartService _cartService = CartService();
+  final CartService _cartService;
+
+  CartProvider({CartService? cartService})
+    : _cartService = cartService ?? CartService();
 
   List<CartItem> _cart = [];
   String? _uid;
@@ -13,6 +16,13 @@ class CartProvider extends ChangeNotifier {
 
   List<CartItem> get cart => _cart;
   bool get isReady => _uid != null;
+
+  // Test-only seam: lets unit tests set cart state directly without
+  // going through Firestore. Not used by production code paths.
+  @visibleForTesting
+  void setCartForTesting(List<CartItem> items) {
+    _cart = items;
+  }
 
   void listenToCart(String uid) {
     // Skip if already listening to this uid
