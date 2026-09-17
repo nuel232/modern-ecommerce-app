@@ -24,6 +24,8 @@ class AddressWidget extends StatefulWidget {
 class _AddressWidgetState extends State<AddressWidget> {
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection('users')
@@ -109,16 +111,23 @@ class _AddressWidgetState extends State<AddressWidget> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
-                          addresses.isEmpty
-                              ? Icons.add_location_alt_outlined
-                              : Icons.location_on_outlined,
-                          size: 22,
-                          color: addresses.isEmpty
-                              ? Colors.red
-                              : Theme.of(
-                                  context,
-                                ).colorScheme.onPrimary.withOpacity(0.7),
+                        Container(
+                          padding: const EdgeInsets.all(7),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: colorScheme.secondary.withOpacity(0.15),
+                          ),
+                          child: Icon(
+                            addresses.isEmpty
+                                ? Icons.add_location_alt_outlined
+                                : Icons.location_on_outlined,
+                            size: 22,
+                            color: addresses.isEmpty
+                                ? Colors.red
+                                : Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimary.withOpacity(0.7),
+                          ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -156,7 +165,7 @@ class _AddressWidgetState extends State<AddressWidget> {
                                     fontSize: 13,
                                     color: Theme.of(
                                       context,
-                                    ).colorScheme.onPrimary.withOpacity(0.7),
+                                    ).colorScheme.onPrimary.withOpacity(1),
                                   ),
                                 ),
                                 const SizedBox(height: 2),
@@ -166,7 +175,7 @@ class _AddressWidgetState extends State<AddressWidget> {
                                     fontSize: 13,
                                     color: Theme.of(
                                       context,
-                                    ).colorScheme.onPrimary.withOpacity(0.7),
+                                    ).colorScheme.onPrimary.withOpacity(1),
                                   ),
                                 ),
                               ],

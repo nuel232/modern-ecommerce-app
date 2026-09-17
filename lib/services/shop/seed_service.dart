@@ -134,6 +134,16 @@ class SeedService {
       stock: 9,
       imagePath: 'lib/Images/SILK-COTTON-BLEND-SHIRT.png',
     ),
+    // ===== TEST (cheap item for exercising checkout/payment) =====
+    ProductModel(
+      productId: '15',
+      categoryId: 'Cat_002',
+      name: 'Test Item',
+      description: 'Low-cost item for testing checkout and payment.',
+      price: 100,
+      stock: 5,
+      imagePath: 'lib/Images/Glasses.jpg',
+    ),
   ];
 
   Future<void> seedProductsIfEmpty() async {

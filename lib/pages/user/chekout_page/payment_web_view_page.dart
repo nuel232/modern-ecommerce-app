@@ -19,6 +19,17 @@ class _PaymentWebViewPageState extends State<PaymentWebViewPage> {
     super.initState();
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      // Paystack's "Cancel Payment" button calls window.close(), since
+      // their checkout page is normally opened as a popup. A WebView has
+      // no window to close, so that call was silently doing nothing.
+      // This channel + override lets us catch it and pop the page instead.
+      ..addJavaScriptChannel(
+        'PaystackCancel',
+        onMessageReceived: (message) {
+          if (!mounted) return;
+          Navigator.pop(context);
+        },
+      )
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageStarted: (url) {
@@ -28,6 +39,32 @@ class _PaymentWebViewPageState extends State<PaymentWebViewPage> {
           onPageFinished: (url) {
             if (!mounted) return;
             setState(() => _isLoading = false);
+            // Don't guess what Paystack's Cancel Payment button's own
+            // handler does (window.close() didn't fix it) — instead watch
+            // for that button directly and fire our channel on click.
+            // MutationObserver covers it even if Paystack renders the
+            // checkout UI asynchronously after the page "finishes" loading.
+            _controller.runJavaScript('''
+              (function() {
+                function attach(el) {
+                  if (el.dataset.flutterCancelBound) return;
+                  el.dataset.flutterCancelBound = '1';
+                  el.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    PaystackCancel.postMessage('cancel');
+                  }, true);
+                }
+                function scan() {
+                  document.querySelectorAll('button, a, div, span').forEach(function(el) {
+                    var text = (el.textContent || '').trim();
+                    if (text === 'Cancel Payment') attach(el);
+                  });
+                }
+                scan();
+                new MutationObserver(scan).observe(document.body, {childList: true, subtree: true});
+              })();
+            ''');
           },
           onProgress: (progress) {
             if (!mounted) return;

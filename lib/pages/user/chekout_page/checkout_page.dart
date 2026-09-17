@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:morden_ecommerce_app/component/my_button.dart';
 import 'package:morden_ecommerce_app/models/address_model.dart';
 import 'package:morden_ecommerce_app/pages/user/chekout_page/order_status_page.dart';
+import 'package:morden_ecommerce_app/pages/user/chekout_page/payment_cancelled_page.dart';
 import 'package:morden_ecommerce_app/pages/user/chekout_page/payment_web_view_page.dart';
 import 'package:morden_ecommerce_app/pages/user/chekout_page/widgets/Shipping_method.dart';
 import 'package:morden_ecommerce_app/pages/user/chekout_page/widgets/address_widget.dart';
@@ -35,6 +36,34 @@ class _CheckoutPageState extends State<CheckoutPage> {
   final ValueNotifier<String?> _shippingError = ValueNotifier(null);
   String? _lastCalculatedKey;
   bool _isProcessing = false;
+
+  // Created once instead of inline in build() — otherwise every setState()
+  // (picking an address, shipping method, or payment method) would call
+  // .snapshots() again, handing StreamBuilder a brand-new Stream instance
+  // and making it drop back to ConnectionState.waiting, which flashes the
+  // loading spinner and looks like the whole page reloaded.
+  late final Stream<DocumentSnapshot<Map<String, dynamic>>> _userStream =
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .snapshots();
+
+  // Built once and reused (same List instance) across every rebuild.
+  // flutter_animate's Animate widget compares the effects list by
+  // reference; chaining .animate().fadeIn().moveY() fresh inside build()
+  // creates a new list every time, which the widget reads as "the
+  // effects changed" and restarts the intro fade/slide from the top.
+  // That's what caused the form to visibly jump/move on every tap of
+  // address, shipping, or payment — it was replaying its entrance
+  // animation on every single setState.
+  static final List<Effect> _introEffects = [
+    FadeEffect(
+      delay: 200.ms,
+      duration: 600.ms,
+      curve: Curves.fastEaseInToSlowEaseOut,
+    ),
+    const MoveEffect(begin: Offset(0, 100)),
+  ];
 
   @override
   void dispose() {
@@ -101,6 +130,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
     if (!mounted) return;
 
+    final paystackReference = result.data['reference'] as String?;
+
     final reference = await Navigator.push<String>(
       context,
       MaterialPageRoute(
@@ -110,7 +141,37 @@ class _CheckoutPageState extends State<CheckoutPage> {
     );
 
     if (reference == null) {
-      // User backed out of the payment page before completing it.
+      // User backed out of the payment page before completing it. Record
+      // it as a cancelled order (rather than just silently returning) so
+      // it shows up in order history the same way a paid or declined
+      // attempt would.
+      if (paystackReference != null) {
+        try {
+          await FirebaseFunctions.instance
+              .httpsCallable('cancelPendingOrder')
+              .call({
+                'reference': paystackReference,
+                'items': items
+                    .map(
+                      (item) => {
+                        'name': item.name,
+                        'quantity': item.quantity,
+                        'price': item.price,
+                      },
+                    )
+                    .toList(),
+                'total': total,
+              });
+        } catch (_) {
+          // Best-effort — if this fails the attempt just won't show up
+          // in history, but the user still sees the cancelled screen.
+        }
+      }
+      if (!mounted) return;
+      await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const PaymentCancelledPage()),
+      );
       return;
     }
 
@@ -170,10 +231,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
       body: Stack(
         children: [
           StreamBuilder(
-            stream: FirebaseFirestore.instance
-                .collection('users')
-                .doc(FirebaseAuth.instance.currentUser!.uid)
-                .snapshots(),
+            stream: _userStream,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
@@ -187,49 +245,37 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 children: [
                   Expanded(
                     child: SingleChildScrollView(
-                      child:
-                          Column(
-                                children: [
-                                  AddressWidget(
-                                    selectedAddress: _selectedAddress,
-                                    onChanged: (address) {
-                                      setState(
-                                        () => _selectedAddress = address,
-                                      );
-                                      _maybeCalculateShipping();
-                                    },
-                                  ),
-                                  //order summary
-                                  OrderSummary(),
+                      child: Column(
+                        children: [
+                          AddressWidget(
+                            selectedAddress: _selectedAddress,
+                            onChanged: (address) {
+                              setState(() => _selectedAddress = address);
+                              _maybeCalculateShipping();
+                            },
+                          ),
+                          //order summary
+                          OrderSummary(),
 
-                                  //delivery method
-                                  ShippingMethod(
-                                    selectedShipping: _selectedShippingMethod,
-                                    onChanged: (method) {
-                                      setState(
-                                        () => _selectedShippingMethod = method,
-                                      );
-                                      _maybeCalculateShipping();
-                                    },
-                                  ),
-                                  //Promo code
+                          //delivery method
+                          ShippingMethod(
+                            selectedShipping: _selectedShippingMethod,
+                            onChanged: (method) {
+                              setState(() => _selectedShippingMethod = method);
+                              _maybeCalculateShipping();
+                            },
+                          ),
+                          //Promo code
 
-                                  //payment method
-                                  PaymentMethod(
-                                    selectedPayment: _selectedPayment,
-                                    onChanged: (method) {
-                                      setState(() => _selectedPayment = method);
-                                    },
-                                  ),
-                                ],
-                              )
-                              .animate()
-                              .fadeIn(
-                                delay: 200.ms,
-                                duration: 600.ms,
-                                curve: Curves.fastEaseInToSlowEaseOut,
-                              )
-                              .moveY(begin: 100),
+                          //payment method
+                          PaymentMethod(
+                            selectedPayment: _selectedPayment,
+                            onChanged: (method) {
+                              setState(() => _selectedPayment = method);
+                            },
+                          ),
+                        ],
+                      ).animate(effects: _introEffects),
                     ),
                   ),
 

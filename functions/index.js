@@ -306,6 +306,52 @@ async function fulfillOrder(uid, reference, amountPaid) {
   });
 }
 
+/**
+ * Records a terminal non-success payment attempt (cancelled/abandoned or
+ * failed) as a real order doc, instead of letting it vanish. Mirrors
+ * fulfillOrder's idempotency (keyed by reference) but never touches stock
+ * or the cart — the customer didn't pay, so nothing was actually fulfilled
+ * and they should still be able to retry with the same cart.
+ * @param {string} uid User ID
+ * @param {string} reference Paystack transaction reference
+ * @param {string} orderStatus "cancelled" or "failed"
+ * @return {Promise<string|null>} The order ID, or null if already recorded
+ */
+async function recordUnsuccessfulAttempt(uid, reference, orderStatus) {
+  const orderRef = db.collection("orders").doc(reference);
+  const pendingRef = db.collection("pendingOrders").doc(reference);
+
+  return db.runTransaction(async (tx) => {
+    const existingOrder = await tx.get(orderRef);
+    if (existingOrder.exists) {
+      // Already recorded — verify was retried (e.g. user tapped "Check
+      // again") or raced with something else. Don't overwrite.
+      return null;
+    }
+
+    const pendingSnap = await tx.get(pendingRef);
+    const address = pendingSnap.exists ?
+      (pendingSnap.data().address || null) :
+      null;
+
+    tx.set(orderRef, {
+      uid,
+      reference,
+      items: [],
+      address: address || null,
+      totalPrice: 0,
+      status: orderStatus,
+      createdAt: new Date().toISOString(),
+    });
+
+    if (pendingSnap.exists) {
+      tx.delete(pendingRef);
+    }
+
+    return orderRef.id;
+  });
+}
+
 exports.verifyTransaction = onCall(
     {secrets: [paystackSecretKey]},
     async (request) => {
@@ -340,7 +386,24 @@ exports.verifyTransaction = onCall(
       // Paystack transaction statuses: success | abandoned | failed | pending
       const paystackStatus = data.data.status;
 
+      if (paystackStatus === "pending") {
+        // Not terminal yet — the bank may still confirm it. Don't record
+        // anything; the client will call verify again later.
+        return {
+          verified: false,
+          status: paystackStatus,
+          reference,
+        };
+      }
+
       if (paystackStatus !== "success") {
+        // Terminal, non-success outcome (abandoned/cancelled or failed).
+        // Record it so it shows up in the customer's order history instead
+        // of silently disappearing.
+        const orderStatus = paystackStatus === "abandoned" ?
+          "cancelled" :
+          "failed";
+        await recordUnsuccessfulAttempt(uid, reference, orderStatus);
         return {
           verified: false,
           status: paystackStatus,

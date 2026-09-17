@@ -23,67 +23,111 @@ class AddressList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
           child: Stack(
             alignment: Alignment.center,
             children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              // Centered Title
-              Center(
-                child: Text(
-                  'Shipping Address',
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-
-              // Close Button on the Right
-              Align(
-                alignment: Alignment.centerRight,
-                child: GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: Icon(Icons.close),
+              // Align(
+              //   alignment: Alignment.topCenter,
+              //   child: Container(
+              //     width: 40,
+              //     height: 4,
+              //     margin: const EdgeInsets.only(bottom: 4),
+              //     decoration: BoxDecoration(
+              //       color: colorScheme.onSurface.withOpacity(0.2),
+              //       borderRadius: BorderRadius.circular(2),
+              //     ),
+              //   ),
+              // ),
+              Padding(
+                padding: const EdgeInsets.only(top: 14),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(7),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: colorScheme.secondary.withOpacity(0.15),
+                      ),
+                      child: Icon(
+                        Icons.location_on_rounded,
+                        size: 16,
+                        color: colorScheme.secondary,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      'Shipping Address',
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const Spacer(),
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: colorScheme.onPrimary.withOpacity(0.08),
+                        ),
+                        child: Icon(
+                          Icons.close_rounded,
+                          size: 18,
+                          color: colorScheme.onSurface.withOpacity(0.7),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
         ),
 
-        Divider(height: 0.5, color: Colors.grey.shade700),
-        Expanded(
+        Divider(height: 0.5, color: colorScheme.onSurface.withOpacity(0.1)),
+        Flexible(
           child: StreamBuilder(
             stream: getAddresses(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const CircularProgressIndicator();
+                return const Padding(
+                  padding: EdgeInsets.all(32),
+                  child: Center(child: CircularProgressIndicator()),
+                );
               }
               if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return const Text('No addresses found');
+                return Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Center(
+                    child: Text(
+                      'No addresses found',
+                      style: GoogleFonts.dmSans(
+                        color: colorScheme.onSurface.withOpacity(0.6),
+                      ),
+                    ),
+                  ),
+                );
               }
 
               final addresses = snapshot.data!;
 
-              return ListView.builder(
+              return ListView.separated(
+                shrinkWrap: true,
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                 itemCount: addresses.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 10),
                 itemBuilder: (context, index) {
                   final address = addresses[index];
-                  return GestureDetector(
+                  return InkWell(
+                    borderRadius: BorderRadius.circular(16),
                     onTap: () async {
                       final batch = FirebaseFirestore.instance.batch();
                       final userRef = FirebaseFirestore.instance
@@ -100,81 +144,174 @@ class AddressList extends StatelessWidget {
                       await batch.commit();
                       Navigator.pop(context);
                     },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 10),
-                      margin: EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 10,
-                      ),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      curve: Curves.easeOut,
+                      padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
+                        borderRadius: BorderRadius.circular(16),
+                        color: address.isDefault
+                            ? colorScheme.secondary.withOpacity(0.1)
+                            : colorScheme.primary,
                         border: Border.all(
                           color: address.isDefault
-                              ? Colors.green.shade600
-                              : Theme.of(context).colorScheme.primary,
+                              ? colorScheme.secondary
+                              : colorScheme.onPrimary.withOpacity(0.1),
+                          width: address.isDefault ? 1.5 : 1,
                         ),
-                        color: address.isDefault
-                            ? Colors.green.shade300.withOpacity(0.2)
-                            : Theme.of(context).colorScheme.primary,
+                        boxShadow: address.isDefault
+                            ? [
+                                BoxShadow(
+                                  color: colorScheme.secondary.withOpacity(0.2),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ]
+                            : null,
                       ),
-
-                      child: ListTile(
-                        title: Text('Shipping Address'),
-
-                        subtitle: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Contact: ${address.email}'),
-                            Text('name: ${address.fullName}'),
-                            Text('phone: ${address.phoneNumber}'),
-                            Text(
-                              'Ship to:  ${address.streetAddress}, ${address.city}, ${address.state} ',
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(9),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: address.isDefault
+                                  ? LinearGradient(
+                                      colors: [
+                                        colorScheme.secondary,
+                                        colorScheme.secondary.withOpacity(0.7),
+                                      ],
+                                    )
+                                  : null,
+                              color: address.isDefault
+                                  ? null
+                                  : colorScheme.onPrimary.withOpacity(0.06),
                             ),
-                          ],
-                        ),
-                        trailing: GestureDetector(
-                          onTap: () async {
-                            // EDIT — pass existing address
-                            final updatedAddress =
-                                await Navigator.push<AddressModel>(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        AddressForm(existingAddress: address),
+                            child: Icon(
+                              Icons.location_on_rounded,
+                              size: 18,
+                              color: address.isDefault
+                                  ? colorScheme.onSecondary
+                                  : colorScheme.onPrimary.withOpacity(0.6),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      address.fullName,
+                                      style: GoogleFonts.dmSans(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    if (address.isDefault) ...[
+                                      const SizedBox(width: 8),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 2,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: colorScheme.secondary,
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          'Default',
+                                          style: GoogleFonts.dmSans(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                            color: colorScheme.onSecondary,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  '${address.streetAddress}, ${address.city}, ${address.state}',
+                                  style: GoogleFonts.dmSans(
+                                    fontSize: 13,
+                                    color: colorScheme.onPrimary.withOpacity(
+                                      0.6,
+                                    ),
                                   ),
-                                );
+                                ),
+                                const SizedBox(height: 3),
+                                Text(
+                                  address.phoneNumber,
+                                  style: GoogleFonts.dmSans(
+                                    fontSize: 13,
+                                    color: colorScheme.onPrimary.withOpacity(
+                                      0.6,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  address.email,
+                                  style: GoogleFonts.dmSans(
+                                    fontSize: 12,
+                                    color: colorScheme.onPrimary.withOpacity(
+                                      0.45,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () async {
+                              // EDIT — pass existing address
+                              final updatedAddress =
+                                  await Navigator.push<AddressModel>(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          AddressForm(existingAddress: address),
+                                    ),
+                                  );
 
-                            if (updatedAddress != null) {
-                              //replace the old address in firestore
-                              final updatedList = addresses
-                                  .map(
-                                    (a) =>
-                                        a.addressId == updatedAddress.addressId
-                                        ? updatedAddress.toMap()
-                                        : a.toMap(),
-                                  )
-                                  .toList();
-
-                              await FirebaseFirestore.instance
-                                  .collection('users')
-                                  .doc(FirebaseAuth.instance.currentUser!.uid)
-                                  .update({
-                                    'addresses': addresses
-                                        .map(
-                                          (a) =>
-                                              a.addressId ==
-                                                  updatedAddress.addressId
-                                              ? updatedAddress.toMap()
-                                              : a.toMap(),
-                                        )
-                                        .toList(),
-                                  });
-                            }
-                          },
-
-                          child: Icon(Icons.edit_note_rounded, size: 25),
-                        ),
+                              if (updatedAddress != null) {
+                                //replace the old address in firestore
+                                await FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                                    .update({
+                                      'addresses': addresses
+                                          .map(
+                                            (a) =>
+                                                a.addressId ==
+                                                    updatedAddress.addressId
+                                                ? updatedAddress.toMap()
+                                                : a.toMap(),
+                                          )
+                                          .toList(),
+                                    });
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(7),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: colorScheme.onPrimary.withOpacity(0.06),
+                              ),
+                              child: Icon(
+                                Icons.edit_rounded,
+                                size: 16,
+                                color: colorScheme.onPrimary.withOpacity(0.6),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   );
@@ -185,7 +322,7 @@ class AddressList extends StatelessWidget {
         ),
         Container(
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
+            color: colorScheme.surface,
             boxShadow: [
               BoxShadow(
                 color: Colors.black26,
