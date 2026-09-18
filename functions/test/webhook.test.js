@@ -155,6 +155,49 @@ describe("handlePaystackWebhook", () => {
         assert.equal(db._dump()["orders/ref123"], undefined);
       });
 
+  test("upgrades a cancelled order on a late charge.success", async () => {
+    db._seedDoc("users/user1/cart/item1", {
+      productId: "prod1",
+      quantity: 1,
+      isSelected: true,
+      cartItemId: "item1",
+    });
+    db._seedDoc("products/prod1", {name: "Widget", price: 1000, stock: 5});
+    db._seedDoc("pendingOrders/ref123", {
+      uid: "user1",
+      address: null,
+      items: [{productId: "prod1", quantity: 1, price: 1000, name: "Widget"}],
+      total: 1075,
+    });
+    db._seedDoc("orders/ref123", {
+      uid: "user1",
+      reference: "ref123",
+      status: "cancelled",
+      items: [{productId: "prod1", quantity: 1, price: 1000, name: "Widget"}],
+      totalPrice: 1075,
+    });
+
+    const req = fakeWebhookReq({
+      event: {
+        event: "charge.success",
+        data: {
+          reference: "ref123",
+          amount: 107500,
+          metadata: {uid: "user1"},
+        },
+      },
+      secret: SECRET,
+    });
+    const res = fakeRes();
+
+    await handlePaystackWebhook(req, res, SECRET);
+
+    assert.equal(res.statusCode, 200);
+    const dump = db._dump();
+    assert.equal(dump["orders/ref123"].status, "paid");
+    assert.equal(dump["products/prod1"].stock, 4);
+  });
+
   test("returns 200 and does not throw when metadata.uid is missing",
       async () => {
         const req = fakeWebhookReq({

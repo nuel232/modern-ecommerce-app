@@ -19,7 +19,7 @@ class OrderLineItem {
   });
 }
 
-enum _OrderStatus { verifying, success, pending, declined }
+enum _OrderStatus { verifying, success, pending, declined, cancelled }
 
 /// Shown right after the payment WebView redirects back into the app.
 /// Confirms the transaction with the backend and renders a state that
@@ -71,9 +71,11 @@ class _OrderStatusPageState extends State<OrderStatusPage> {
       } else {
         final paystackStatus = data['status'] as String?;
         setState(() {
-          _status = paystackStatus == 'pending'
-              ? _OrderStatus.pending
-              : _OrderStatus.declined;
+          _status = switch (paystackStatus) {
+            'pending' => _OrderStatus.pending,
+            'abandoned' => _OrderStatus.cancelled,
+            _ => _OrderStatus.declined,
+          };
         });
       }
     } catch (e) {
@@ -136,6 +138,11 @@ class _OrderStatusPageState extends State<OrderStatusPage> {
         );
       case _OrderStatus.declined:
         return _DeclinedView(
+          onTryAgain: _backToCheckout,
+          onContinueShopping: _backToShopping,
+        );
+      case _OrderStatus.cancelled:
+        return _CancelledView(
           onTryAgain: _backToCheckout,
           onContinueShopping: _backToShopping,
         );
@@ -371,6 +378,87 @@ class _PendingView extends StatelessWidget {
               ),
             ),
             child: const Text('Continue Shopping'),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _CancelledView extends StatelessWidget {
+  final VoidCallback onTryAgain;
+  final VoidCallback onContinueShopping;
+
+  const _CancelledView({
+    required this.onTryAgain,
+    required this.onContinueShopping,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 90,
+          height: 90,
+          decoration: const BoxDecoration(
+            color: Colors.orange,
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(
+            Icons.close_rounded,
+            color: Colors.white,
+            size: 50,
+          ),
+        ).animate().fadeIn(duration: 250.ms).scale(),
+        const SizedBox(height: 24),
+        Text(
+          'Payment Cancelled',
+          style: GoogleFonts.poppins(fontSize: 22, fontWeight: FontWeight.bold),
+        ).animate().fadeIn(delay: 150.ms),
+        const SizedBox(height: 8),
+        Text(
+          'You cancelled the payment. No charge was made — you can try again whenever you\'re ready.',
+          textAlign: TextAlign.center,
+          style: GoogleFonts.dmSans(fontSize: 14, color: Colors.grey),
+        ).animate().fadeIn(delay: 200.ms),
+        const SizedBox(height: 28),
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: onTryAgain,
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: Text(
+              'Try Again',
+              style: GoogleFonts.dmSans(
+                color: Theme.of(context).colorScheme.onSecondary,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton(
+            onPressed: onContinueShopping,
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: Text(
+              'Continue Shopping',
+              style: GoogleFonts.dmSans(
+                color: Theme.of(context).colorScheme.onSecondary,
+              ),
+            ),
           ),
         ),
       ],

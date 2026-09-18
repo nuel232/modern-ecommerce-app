@@ -5,7 +5,8 @@ process.env.NODE_ENV = "test";
 const {test, describe, beforeEach} = require("node:test");
 const assert = require("node:assert/strict");
 const {FakeFirestore} = require("./fakeFirestore");
-const {computeOrderAmount, fulfillOrder, __setTestDeps} =
+const {computeOrderAmount, fulfillOrder, recordUnsuccessfulAttempt,
+  __setTestDeps} =
   require("../index").__testables;
 
 /**
@@ -115,6 +116,10 @@ describe("computeOrderAmount", () => {
     assert.equal(result.shippingCost, 200);
     // total = 2500 + 200 + 202.5 = 2902.5
     assert.equal(result.total, 2902.5);
+    assert.equal(result.items.length, 2);
+    assert.equal(result.items[0].name, "A");
+    assert.equal(result.items[0].quantity, 2);
+    assert.equal(result.items[1].name, "B");
   });
 });
 
@@ -239,6 +244,107 @@ describe("fulfillOrder", () => {
             },
         );
       });
+
+  test("upgrades a cancelled order when payment later succeeds", async () => {
+    db._seedDoc("users/user1/cart/item1", {
+      productId: "prod1",
+      quantity: 1,
+      isSelected: true,
+      cartItemId: "item1",
+    });
+    db._seedDoc("products/prod1", {name: "Widget", price: 1000, stock: 10});
+    db._seedDoc("pendingOrders/ref123", {
+      uid: "user1",
+      address: {line1: "1 Test St"},
+      items: [{productId: "prod1", quantity: 1, price: 1000, name: "Widget"}],
+      total: 1075,
+    });
+    db._seedDoc("orders/ref123", {
+      uid: "user1",
+      reference: "ref123",
+      items: [{productId: "prod1", quantity: 1, price: 1000, name: "Widget"}],
+      totalPrice: 1075,
+      status: "cancelled",
+      createdAt: "2026-01-01T00:00:00.000Z",
+    });
+
+    const orderId = await fulfillOrder("user1", "ref123", 1075);
+    assert.equal(orderId, "ref123");
+
+    const dump = db._dump();
+    assert.equal(dump["orders/ref123"].status, "paid");
+    assert.equal(dump["products/prod1"].stock, 9);
+    assert.equal(dump["users/user1/cart/item1"], undefined);
+    assert.equal(dump["pendingOrders/ref123"], undefined);
+  });
+
+  test("fulfills from the pending snapshot if the cart is already empty",
+      async () => {
+        db._seedDoc("products/prod1", {name: "Widget", price: 1000, stock: 4});
+        db._seedDoc("pendingOrders/ref123", {
+          uid: "user1",
+          address: null,
+          items: [{
+            productId: "prod1",
+            quantity: 2,
+            price: 1000,
+            name: "Widget",
+          }],
+          total: 2150,
+        });
+
+        const orderId = await fulfillOrder("user1", "ref123", 2150);
+        assert.equal(orderId, "ref123");
+
+        const dump = db._dump();
+        assert.equal(dump["orders/ref123"].status, "paid");
+        assert.equal(dump["orders/ref123"].items[0].quantity, 2);
+        assert.equal(dump["products/prod1"].stock, 2);
+      });
+});
+
+describe("recordUnsuccessfulAttempt", () => {
+  let db;
+
+  beforeEach(() => {
+    db = new FakeFirestore();
+    __setTestDeps({db});
+  });
+
+  test("copies snapshotted items and total onto the order", async () => {
+    db._seedDoc("pendingOrders/ref123", {
+      uid: "user1",
+      address: {line1: "1 Test St"},
+      items: [{productId: "prod1", quantity: 2, price: 1000, name: "Widget"}],
+      total: 2150,
+      createdAt: "2026-01-01T00:00:00.000Z",
+    });
+
+    const orderId = await recordUnsuccessfulAttempt(
+        "user1", "ref123", "cancelled");
+    assert.equal(orderId, "ref123");
+
+    const dump = db._dump();
+    const order = dump["orders/ref123"];
+    assert.equal(order.status, "cancelled");
+    assert.equal(order.totalPrice, 2150);
+    assert.equal(order.items[0].name, "Widget");
+    // Pending stays so a late charge.success can still fulfill.
+    assert.notEqual(dump["pendingOrders/ref123"], undefined);
+  });
+
+  test("does not overwrite an already-paid order", async () => {
+    db._seedDoc("orders/ref123", {
+      uid: "user1",
+      status: "paid",
+      totalPrice: 1075,
+    });
+
+    const orderId = await recordUnsuccessfulAttempt(
+        "user1", "ref123", "cancelled");
+    assert.equal(orderId, null);
+    assert.equal(db._dump()["orders/ref123"].status, "paid");
+  });
 });
 
 describe("computeOrderAmount + fetch interplay (sanity check)", () => {

@@ -6,7 +6,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:morden_ecommerce_app/component/my_button.dart';
 import 'package:morden_ecommerce_app/models/address_model.dart';
 import 'package:morden_ecommerce_app/pages/user/chekout_page/order_status_page.dart';
-import 'package:morden_ecommerce_app/pages/user/chekout_page/payment_cancelled_page.dart';
 import 'package:morden_ecommerce_app/pages/user/chekout_page/payment_web_view_page.dart';
 import 'package:morden_ecommerce_app/pages/user/chekout_page/widgets/Shipping_method.dart';
 import 'package:morden_ecommerce_app/pages/user/chekout_page/widgets/address_widget.dart';
@@ -132,7 +131,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
     final paystackReference = result.data['reference'] as String?;
 
-    final reference = await Navigator.push<String>(
+    final callbackReference = await Navigator.push<String>(
       context,
       MaterialPageRoute(
         builder: (context) =>
@@ -140,47 +139,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
       ),
     );
 
-    if (reference == null) {
-      // User backed out of the payment page before completing it. Record
-      // it as a cancelled order (rather than just silently returning) so
-      // it shows up in order history the same way a paid or declined
-      // attempt would.
-      if (paystackReference != null) {
-        try {
-          await FirebaseFunctions.instance
-              .httpsCallable('cancelPendingOrder')
-              .call({
-                'reference': paystackReference,
-                'items': items
-                    .map(
-                      (item) => {
-                        'name': item.name,
-                        'quantity': item.quantity,
-                        'price': item.price,
-                      },
-                    )
-                    .toList(),
-                'total': total,
-              });
-        } catch (_) {
-          // Best-effort — if this fails the attempt just won't show up
-          // in history, but the user still sees the cancelled screen.
-        }
-      }
-      if (!mounted) return;
-      await Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const PaymentCancelledPage()),
-      );
-      return;
-    }
+    // Closing the WebView is not a payment outcome — Paystack may still
+    // confirm a charge. Always verify with the initialize reference.
+    final reference = callbackReference ?? paystackReference;
+    if (reference == null || !mounted) return;
 
-    if (!mounted) return;
-
-    // Hand off to the status page — it confirms the transaction (and, on
-    // success, the backend atomically creates the order + decrements stock)
-    // then shows a dynamic success / pending / declined state as soon as
-    // we land back here from Paystack's redirect.
     await Navigator.push(
       context,
       MaterialPageRoute(

@@ -48,6 +48,7 @@ async function computeOrderAmount(uid, shippingCost) {
 
   const cartItems = cartSnap.docs.map((doc) => doc.data());
 
+  const items = [];
   let subtotal = 0;
   for (const item of cartItems) {
     const productSnap = await db
@@ -71,6 +72,12 @@ async function computeOrderAmount(uid, shippingCost) {
       );
     }
 
+    items.push({
+      productId: item.productId,
+      quantity: item.quantity,
+      price: product.price,
+      name: product.name,
+    });
     subtotal += product.price * item.quantity;
   }
 
@@ -78,7 +85,7 @@ async function computeOrderAmount(uid, shippingCost) {
   const vat = vatableAmount * 0.075;
   const total = subtotal + shippingCost + vat;
 
-  return {subtotal, vat, shippingCost, total};
+  return {subtotal, vat, shippingCost, total, items};
 }
 
 exports.initializeTransaction = onCall(
@@ -117,7 +124,7 @@ exports.initializeTransaction = onCall(
         paystackChannels = channels;
       }
 
-      const {subtotal, vat, total} = await computeOrderAmount(
+      const {subtotal, vat, total, items} = await computeOrderAmount(
           uid,
           shippingCost,
       );
@@ -137,6 +144,8 @@ exports.initializeTransaction = onCall(
       await db.collection("pendingOrders").doc(reference).set({
         uid,
         address: address || null,
+        items,
+        total,
         createdAt: new Date().toISOString(),
       });
 
@@ -203,20 +212,23 @@ async function fulfillOrder(uid, reference, amountPaid) {
 
   return db.runTransaction(async (tx) => {
     const existingOrder = await tx.get(orderRef);
-    if (existingOrder.exists) {
-      // Already fulfilled — either the webhook and the client's verify
-      // call raced, or verify was retried. Don't double-process.
+    if (existingOrder.exists && existingOrder.data().status === "paid") {
+      // Already fulfilled — webhook and verify raced, or verify retried.
+      // Unpaid placeholders (cancelled/failed) are upgraded below so a
+      // late charge.success still decrements stock.
       return null;
     }
 
-    // Shipping address was snapshotted server-side at initializeTransaction
-    // time, before payment started, so this works whether fulfillment is
-    // triggered by the client (verifyTransaction) or by Paystack's webhook
-    // with no client involved at all.
+    // Shipping address and line items were snapshotted server-side at
+    // initializeTransaction, so fulfillment works from verify, the
+    // webhook, or a late success after the customer closed checkout.
     const pendingSnap = await tx.get(pendingRef);
-    const address = pendingSnap.exists ?
-      (pendingSnap.data().address || null) :
-      null;
+    const pendingData = pendingSnap.exists ? pendingSnap.data() : {};
+    const existingData = existingOrder.exists ? existingOrder.data() : {};
+    const address = pendingData.address || existingData.address || null;
+    const snapshotItems = Array.isArray(pendingData.items) ?
+      pendingData.items :
+      (Array.isArray(existingData.items) ? existingData.items : []);
 
     const cartSnap = await tx.get(
         db.collection("users")
@@ -225,9 +237,20 @@ async function fulfillOrder(uid, reference, amountPaid) {
             .where("isSelected", "==", true),
     );
 
-    if (cartSnap.empty) {
-      // Cart already cleared (e.g. verify retried after success) — nothing
-      // left to fulfill, but we still record the order for the receipt.
+    const sourceItems = !cartSnap.empty ?
+      cartSnap.docs.map((doc) => ({
+        productId: doc.data().productId,
+        quantity: doc.data().quantity,
+        cartDoc: doc,
+      })) :
+      snapshotItems.map((item) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        cartDoc: null,
+      }));
+
+    if (sourceItems.length === 0) {
+      // Cart already cleared and no snapshot — still record the receipt.
       tx.set(orderRef, {
         uid,
         reference,
@@ -235,14 +258,14 @@ async function fulfillOrder(uid, reference, amountPaid) {
         address: address || null,
         totalPrice: amountPaid,
         status: "paid",
-        createdAt: new Date().toISOString(),
+        createdAt: existingData.createdAt || new Date().toISOString(),
       });
-      tx.delete(pendingRef);
+      if (pendingSnap.exists) tx.delete(pendingRef);
       return orderRef.id;
     }
 
-    const productRefs = cartSnap.docs.map((doc) =>
-      db.collection("products").doc(doc.data().productId),
+    const productRefs = sourceItems.map((item) =>
+      db.collection("products").doc(item.productId),
     );
     const productSnaps = await Promise.all(
         productRefs.map((ref) => tx.get(ref)),
@@ -253,37 +276,35 @@ async function fulfillOrder(uid, reference, amountPaid) {
     // payment already succeeded, so this needs to surface as a distinct,
     // reviewable state rather than a quietly-oversold order.
     productSnaps.forEach((productSnap, i) => {
-      const cartDoc = cartSnap.docs[i];
-      const {quantity} = cartDoc.data();
+      const source = sourceItems[i];
 
       if (!productSnap.exists) {
         throw new HttpsError(
             "not-found",
-            `INSUFFICIENT_STOCK: product ${cartDoc.data().productId} ` +
+            `INSUFFICIENT_STOCK: product ${source.productId} ` +
             "no longer exists",
         );
       }
       const product = productSnap.data();
-      if ((product.stock || 0) < quantity) {
+      if ((product.stock || 0) < source.quantity) {
         throw new HttpsError(
             "failed-precondition",
             `INSUFFICIENT_STOCK: ${product.name} — only ` +
-            `${product.stock || 0} left, ${quantity} requested`,
+            `${product.stock || 0} left, ${source.quantity} requested`,
         );
       }
     });
 
     const items = [];
     productSnaps.forEach((productSnap, i) => {
-      const cartDoc = cartSnap.docs[i];
-      const {productId, quantity} = cartDoc.data();
+      const source = sourceItems[i];
       const product = productSnap.data();
-      const newStock = (product.stock || 0) - quantity;
+      const newStock = (product.stock || 0) - source.quantity;
 
       tx.update(productSnap.ref, {stock: newStock});
       items.push({
-        productId,
-        quantity,
+        productId: source.productId,
+        quantity: source.quantity,
         price: product.price,
         name: product.name,
       });
@@ -296,11 +317,13 @@ async function fulfillOrder(uid, reference, amountPaid) {
       address: address || null,
       totalPrice: amountPaid,
       status: "paid",
-      createdAt: new Date().toISOString(),
+      createdAt: existingData.createdAt || new Date().toISOString(),
     });
 
-    cartSnap.docs.forEach((doc) => tx.delete(doc.ref));
-    tx.delete(pendingRef);
+    sourceItems.forEach((item) => {
+      if (item.cartDoc) tx.delete(item.cartDoc.ref);
+    });
+    if (pendingSnap.exists) tx.delete(pendingRef);
 
     return orderRef.id;
   });
@@ -330,23 +353,19 @@ async function recordUnsuccessfulAttempt(uid, reference, orderStatus) {
     }
 
     const pendingSnap = await tx.get(pendingRef);
-    const address = pendingSnap.exists ?
-      (pendingSnap.data().address || null) :
-      null;
+    const pendingData = pendingSnap.exists ? pendingSnap.data() : {};
 
+    // Keep pendingOrders around so a late charge.success can still
+    // fulfill. Closing the WebView is not proof the charge failed.
     tx.set(orderRef, {
       uid,
       reference,
-      items: [],
-      address: address || null,
-      totalPrice: 0,
+      items: pendingData.items || [],
+      address: pendingData.address || null,
+      totalPrice: pendingData.total || 0,
       status: orderStatus,
-      createdAt: new Date().toISOString(),
+      createdAt: pendingData.createdAt || new Date().toISOString(),
     });
-
-    if (pendingSnap.exists) {
-      tx.delete(pendingRef);
-    }
 
     return orderRef.id;
   });
@@ -515,6 +534,7 @@ async function handlePaystackWebhook(req, res, secretValue) {
 exports.__testables = {
   computeOrderAmount,
   fulfillOrder,
+  recordUnsuccessfulAttempt,
   handlePaystackWebhook,
   __setTestDeps,
 };
